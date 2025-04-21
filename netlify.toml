@@ -2,5 +2,3 @@
 [build]
   functions = "netlify/functions"
 
-[build.environment]
-  NODE_VERSION = "22.x"
