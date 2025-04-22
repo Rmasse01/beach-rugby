@@ -133,14 +133,14 @@
         <button type="button" class="carousel-btn prev">&#8249;</button>
         <div class="carousel-track-container">
           <ul class="carousel-track">
-            <li class="slide"><img src="maillots/maillot1.png" alt="maillot1"></li>
-            <li class="slide"><img src="maillots/maillot2.png" alt="maillot2"></li>
-            <li class="slide"><img src="maillots/maillot3.png" alt="maillot3"></li>
-            <li class="slide"><img src="maillots/maillot4.png" alt="maillot4"></li>
-            <li class="slide"><img src="maillots/maillot5.png" alt="maillot5"></li>
-            <li class="slide"><img src="maillots/maillot6.png" alt="maillot6"></li>
-            <li class="slide"><img src="maillots/maillot7.png" alt="maillot7"></li>
-            <li class="slide"><img src="maillots/maillot8.png" alt="maillot8"></li>
+            <li class="slide"><img src="maillots/maillot01.png" alt="maillot1"></li>
+            <li class="slide"><img src="maillots/maillot02.png" alt="maillot2"></li>
+            <li class="slide"><img src="maillots/maillot03.png" alt="maillot3"></li>
+            <li class="slide"><img src="maillots/maillot04.png" alt="maillot4"></li>
+            <li class="slide"><img src="maillots/maillot05.png" alt="maillot5"></li>
+            <li class="slide"><img src="maillots/maillot06.png" alt="maillot6"></li>
+            <li class="slide"><img src="maillots/maillot07.png" alt="maillot7"></li>
+            <li class="slide"><img src="maillots/maillot08.png" alt="maillot8"></li>
           </ul>
         </div>
         <button type="button" class="carousel-btn next">&#8250;</button>
@@ -192,6 +192,29 @@
   <input type="email" name="email" required>
   <button type="submit">Send</button>
 </form>
+<div id="dataDisplay">
+  <h2>Données des inscriptions</h2>
+  <table id="dataTable">
+    <thead>
+      <tr>
+        <th>Nom de l'équipe</th>
+        <th>Maillot</th>
+        <th>Nom</th>
+        <th>Taille</th>
+        <th>Numéro</th>
+        <th>Anecdote</th>
+        <th>Logo Sponsor</th>
+        <th>Email Capitaine</th>
+        <th>IP</th>
+        <th>User Agent</th>
+        <th>Referrer</th>
+        <th>Date de Création</th>
+      </tr>
+    </thead>
+    <tbody>
+      </tbody>
+  </table>
+</div>
 
   <script>
     const track       = document.querySelector('.carousel-track');
@@ -204,8 +227,13 @@
     const submitBtn   = document.getElementById('submitBtn');
     const emailInput  = document.getElementById('email');
     const maxPlayers  = 10;
+    const dataTable   = document.getElementById('dataTable').getElementsByTagName('tbody')[0]; // Cibler le tbody pour insérer les données
+    const dataDisplay = document.getElementById('dataDisplay'); // Cibler la div pour potentiellement la masquer initialement
 
-    // Carrousel
+    // Masquer initialement la section d'affichage des données
+    dataDisplay.style.display = 'none';
+
+    // Carrousel (inchangé)
     const pages = Math.ceil(slides.length / 4);
     let pageIndex = 0;
     function updateCarousel() {
@@ -236,7 +264,7 @@
       jerseyInput.value = slides[0].querySelector('img').alt;
     }
 
-    // Ajout de joueurs
+    // Ajout de joueurs (inchangé)
     addBtn.addEventListener('click', () => {
       const count = playersList.children.length;
       if (count < maxPlayers) {
@@ -257,7 +285,7 @@
       checkFormValidity();
     });
 
-    // Validation sans exigence de 10 joueurs
+    // Validation sans exigence de 10 joueurs (inchangé)
     function checkFormValidity() {
       const rows = Array.from(playersList.children);
       if (rows.length < 1) {
@@ -280,6 +308,34 @@
     document.querySelectorAll('#playersList tr').forEach(attachInputListeners);
     emailInput.addEventListener('input', checkFormValidity);
     checkFormValidity();
-  </script>
-</body>
-</html>
+
+    // Script pour récupérer et afficher les données (à ajouter à la fin de ton script existant)
+    fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
+      .then(response => response.json())
+      .then(data => {
+        dataDisplay.style.display = 'block'; // Afficher la section des données
+        data.forEach(rowData => {
+          const names = rowData.name || [];
+          const sizes = rowData.size || [];
+          const numbers = rowData.number || [];
+          const anecdotes = rowData.anecdote || [];
+          const maxRows = Math.max(1, names.length);
+
+          for (let i = 0; i < Math.min(maxRows, 10); i++) {
+            const dataRow = dataTable.insertRow();
+            dataRow.insertCell().textContent = rowData.teamName || '';
+            dataRow.insertCell().textContent = rowData.jersey || '';
+            dataRow.insertCell().textContent = names[i] || '';
+            dataRow.insertCell().textContent = sizes[i] || '';
+            dataRow.insertCell().textContent = numbers[i] || '';
+            dataRow.insertCell().textContent = anecdotes[i] || '';
+            dataRow.insertCell().textContent = rowData.sponsorLogo || '';
+            dataRow.insertCell().textContent = rowData.email || '';
+            dataRow.insertCell().textContent = rowData.ip || '';
+            dataRow.insertCell().textContent = rowData.user_agent || '';
+            dataRow.insertCell().textContent = rowData.referrer || '';
+            dataRow.insertCell().textContent = rowData.created_at || '';
+          }
+        });
+      })
+      .catch
