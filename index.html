@@ -4,157 +4,129 @@
   <meta charset="UTF-8">
   <title>Inscription – Occitan Beach Rugby</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
   <style>
-    :root {
-      --color-bg:      #F9E6D3;
-      --color-primary: #012A4A;
-      --color-accent:  #FF6F00;
-      --color-panel:   #FFE5B4;
-      --text-color:    #012A4A;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; font-family: 'Poppins', sans-serif; color: var(--text-color); background: var(--color-bg); text-align: center; }
-
-    header {
-      position: fixed; top: 0; left: 0;
-      width: 100%; height: 100vh;
-      background: url('header.jpg') center/cover no-repeat;
-      z-index: 0;
-    }
+    body { font-family: Arial, sans-serif; background: #fef8e7; margin:0; padding:0 }
+    header { position: relative; text-align: center }
+    header img { width:100%; display:block }
     header h1 {
-      position: absolute; top: 20px; left: 50%;
-      transform: translateX(-50%);
-      color: white; font-size: 2.5em; font-weight: 600;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      color:white; font-size:2.5em; margin:0;
+      text-shadow:2px 2px 5px #000;
     }
-
-    .container {
-      position: relative; z-index: 1;
-      width: 100%; margin-top: 100vh;
-      padding: 20px; background: var(--color-bg);
-    }
-
-    h2 { margin-bottom: 16px; }
+    .container { max-width:1000px; margin:auto; padding:20px }
+    h2 { text-align:center }
     label { display: block; margin: 12px 0 4px; font-weight: 500; }
-    h3.choose-left { text-align: left; margin: 24px 0 12px 20px; }
-
     input, select, textarea {
-      width: 80%; max-width: 400px;
-      padding: 8px; margin: 4px auto 16px;
-      border: 1px solid var(--color-primary); border-radius: 4px;
-      font-size: 1em; text-align: left;
+      width:100%; padding:8px; margin:4px 0 12px; box-sizing:border-box;
     }
-
-    @keyframes pulse {
-      0%   { transform: scale(1); }
-      50%  { transform: scale(1.1); }
-      100% { transform: scale(1); }
+    .carousel { display:flex; overflow-x:auto; margin:20px 0 }
+    .carousel img {
+      height:150px; margin-right:10px; cursor:pointer;
+      border:3px solid transparent; flex-shrink:0;
     }
-
-    .carousel-wrapper { position: relative; margin: 24px 0; }
-    .carousel-track-container { overflow: hidden; }
-    .carousel-track {
-      display: flex; transition: transform .5s ease-in-out;
-    }
-    .carousel-track .slide { min-width: 25%; padding: 8px; }
-    .carousel-track .slide img {
-      width: 100%; border: 4px solid transparent; border-radius: 8px;
-      cursor: pointer; display: block; margin: 0 auto;
-    }
-    .carousel-track .slide.selected img {
-      border-color: var(--color-accent);
-      animation: pulse 0.4s ease-in-out;
-    }
-    .carousel-btn {
-      position: absolute; top: 50%; transform: translateY(-50%);
-      background: rgba(1,42,74,0.7); color: #fff; border: none;
-      font-size: 2em; padding: 0 12px; cursor: pointer; z-index: 2;
-      border-radius: 4px;
-    }
-    .carousel-btn.prev { left: 8px; }
-    .carousel-btn.next { right: 8px; }
-
+    .carousel img.selected { border-color:#ff6600 }
     table {
-      width: 90%; margin: auto; border-collapse: collapse; margin-bottom: 16px;
+      width:100%; border-collapse:collapse; margin-bottom:24px;
     }
-    th, td {
-      border: 1px solid var(--color-primary); padding: 8px; text-align: left;
-    }
-    th { background: var(--color-panel); font-weight: 600; }
-
-    button, .payment-link {
-      font-family: inherit; font-size: 1em; cursor: pointer;
-    }
-    button {
-      padding: 10px 16px; margin-bottom: 24px;
-      background: var(--color-accent); color: #fff;
-      border: none; border-radius: 4px;
-    }
+    th, td { border:1px solid #ccc; padding:8px }
+    th { background:#ffe4b5 }
+    .sponsor-upload { margin-bottom:20px }
     .payment-link {
-      display: block; width: 80%; max-width: 300px; margin: 24px auto;
-      padding: 14px; background: var(--color-primary);
-      color: #fff; text-decoration: none; font-weight: 600;
-      border-radius: 6px; margin-bottom: 40px;
+      display:block; width:100%; background:#ff6600; color:#fff;
+      text-align:center; padding:12px; font-size:1.2em;
+      text-decoration:none; border-radius:8px;
     }
-
-    .sponsor-upload, .email-input { margin: 24px 0; }
-
-    @media (max-width: 768px) {
-      header h1 { font-size: 2em; }
-      .carousel-track .slide { min-width: 50%; }
-      table, thead, tbody, th, td, tr { display: block; }
-      thead tr { display: none; }
-      tr { margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
-      td { padding-left: 50%; position: relative; }
-      td::before {
-        position: absolute; left: 10px; width: 45%; white-space: nowrap; font-weight: bold;
+    @media (max-width:768px) {
+      header h1 { font-size:1.8em }
+      .carousel img { height:100px }
+      table, thead, tbody, th, td, tr { display:block }
+      thead tr { display:none }
+      tr {
+        margin-bottom:15px; border:1px solid #ccc;
+        padding:10px; border-radius:8px;
       }
-      td:nth-of-type(1)::before { content: "Nom / Surnom"; }
-      td:nth-of-type(2)::before { content: "Taille"; }
-      td:nth-of-type(3)::before { content: "Numéro"; }
-      td:nth-of-type(4)::before { content: "Anecdote joueur"; }
+      td {
+        padding-left:50%; position:relative; text-align:left;
+      }
+      td::before {
+        position:absolute; left:10px; width:45%;
+        white-space:nowrap; font-weight:bold;
+      }
+      td:nth-of-type(1)::before { content:"Nom / Surnom"; }
+      td:nth-of-type(2)::before { content:"Taille"; }
+      td:nth-of-type(3)::before { content:"Numéro"; }
+      td:nth-of-type(4)::before { content:"Anecdote joueur"; }
     }
   </style>
+  <script>
+    function selectJersey(el) {
+      document.querySelectorAll('.carousel img')
+          .forEach(i => i.classList.remove('selected'));
+      el.classList.add('selected');
+      document.getElementById('jerseyInput').value = el.alt;
+      checkFormValidity(); // Si tu avais la validation du formulaire
+    }
+
+    function checkFormValidity() {
+      const selectedJersey = document.querySelector('.carousel img.selected');
+      const teamNameInput = document.getElementById('teamName');
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (selectedJersey && teamNameInput.value.trim() !== '') {
+        submitBtn.disabled = false;
+      } else {
+        submitBtn.disabled = true;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const firstJersey = document.querySelector('.carousel img:first-child');
+      if (firstJersey) {
+        firstJersey.classList.add('selected');
+        document.getElementById('jerseyInput').value = firstJersey.alt;
+        checkFormValidity(); // Vérifie l'état initial du bouton
+      }
+
+      const teamNameInput = document.getElementById('teamName');
+      if (teamNameInput) {
+        teamNameInput.addEventListener('input', checkFormValidity);
+      }
+    });
+  </script>
 </head>
 <body>
   <header>
+    <img src="header.jpg" alt="Bannière Occitan Beach Rugby">
     <h1>OCCITAN BEACH RUGBY</h1>
   </header>
-
   <div class="container">
     <h2>Inscription d’équipe</h2>
     <form id="registrationForm" method="POST" netlify>
+      <label for="teamName">Nom de l’équipe :</label>
+      <input type="text" id="teamName" name="teamName" required>
 
-      <h3 class="choose-left">Choisissez votre maillot</h3>
-      <div class="carousel-wrapper">
-        <button type="button" class="carousel-btn prev">&#8249;</button>
-        <div class="carousel-track-container">
-          <ul class="carousel-track">
-            <li class="slide"><img src="maillots/maillot01.png" alt="maillot1"></li>
-            <li class="slide"><img src="maillots/maillot02.png" alt="maillot2"></li>
-            <li class="slide"><img src="maillots/maillot03.png" alt="maillot3"></li>
-            <li class="slide"><img src="maillots/maillot04.png" alt="maillot4"></li>
-            <li class="slide"><img src="maillots/maillot05.png" alt="maillot5"></li>
-            <li class="slide"><img src="maillots/maillot06.png" alt="maillot6"></li>
-            <li class="slide"><img src="maillots/maillot07.png" alt="maillot7"></li>
-            <li class="slide"><img src="maillots/maillot08.png" alt="maillot8"></li>
-          </ul>
-        </div>
-        <button type="button" class="carousel-btn next">&#8250;</button>
+      <h3>Choisissez votre maillot :</h3>
+      <div class="carousel">
+        <img src="maillots/maillot01.png" alt="Maillot 01" onclick="selectJersey(this)">
+        <img src="maillots/maillot02.png" alt="Maillot 02" onclick="selectJersey(this)">
+        <img src="maillots/maillot03.png" alt="Maillot 03" onclick="selectJersey(this)">
+        <img src="maillots/maillot04.png" alt="Maillot 04" onclick="selectJersey(this)">
+        <img src="maillots/maillot05.png" alt="Maillot 05" onclick="selectJersey(this)">
+        <img src="maillots/maillot06.png" alt="Maillot 06" onclick="selectJersey(this)">
+        <img src="maillots/maillot07.png" alt="Maillot 07" onclick="selectJersey(this)">
+        <img src="maillots/maillot08.png" alt="Maillot 08" onclick="selectJersey(this)">
       </div>
       <input type="hidden" name="jersey" id="jerseyInput" value="">
-
-      <label for="teamName">Nom de l’équipe :</label>
-      <input type="text" id="teamName" name="teamName" placeholder="Votre nom d’équipe" required>
 
       <h3>Informations des joueurs</h3>
       <table>
         <thead>
           <tr>
-            <th>Nom / Surnom</th><th>Taille</th><th>Numéro (00–99)</th><th>Anecdote joueur</th>
+            <th>Nom / Surnom</th>
+            <th>Taille</th>
+            <th>Numéro (00–99)</th>
+            <th>Anecdote joueur</th>
           </tr>
         </thead>
         <tbody id="playersList">
@@ -162,180 +134,126 @@
             <td><input type="text" name="name[]" required></td>
             <td>
               <select name="size[]">
-                <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option>
+                <option>XS</option><option>S</option><option selected>M</option>
+                <option>L</option><option>XL</option><option>XXL</option>
               </select>
             </td>
             <td><input type="number" name="number[]" min="0" max="99" required></td>
             <td><textarea name="anecdote[]" rows="2"></textarea></td>
           </tr>
+          <tr>
+            <td><input type="text" name="name[]"></td>
+            <td>
+              <select name="size[]">
+                <option>XS</option><option>S</option><option selected>M</option>
+                <option>L</option><option>XL</option><option>XXL</option>
+              </select>
+            </td>
+            <td><input type="number" name="number[]" min="0" max="99"></td>
+            <td><textarea name="anecdote[]" rows="2"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="name[]"></td>
+            <td>
+              <select name="size[]">
+                <option>XS</option><option>S</option><option selected>M</option>
+                <option>L</option><option>XL</option><option>XXL</option>
+              </select>
+            </td>
+            <td><input type="number" name="number[]" min="0" max="99"></td>
+            <td><textarea name="anecdote[]" rows="2"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="name[]"></td>
+            <td>
+              <select name="size[]">
+                <option>XS</option><option>S</option><option selected>M</option>
+                <option>L</option><option>XL</option><option>XXL</option>
+              </select>
+            </td>
+            <td><input type="number" name="number[]" min="0" max="99"></td>
+            <td><textarea name="anecdote[]" rows="2"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="name[]"></td>
+            <td>
+              <select name="size[]">
+                <option>XS</option><option>S</option><option selected>M</option>
+                <option>L</option><option>XL</option><option>XXL</option>
+              </select>
+            </td>
+            <td><input type="number" name="number[]" min="0" max="99"></td>
+            <td><textarea name="anecdote[]" rows="2"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="name[]"></td>
+            <td>
+              <select name="size[]">
+                <option>XS</option><option>S</option><option selected>M</option>
+                <option>L</option><option>XL</option><option>XXL</option>
+              </select>
+            </td>
+            <td><input type="number" name="number[]" min="0" max="99"></td>
+            <td><textarea name="anecdote[]" rows="2"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="name[]"></td>
+            <td>
+              <select name="size[]">
+                <option>XS</option><option>S</option><option selected>M</option>
+                <option>L</option><option>XL</option><option>XXL</option>
+              </select>
+            </td>
+            <td><input type="number" name="number[]" min="0" max="99"></td>
+            <td><textarea name="anecdote[]" rows="2"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="name[]"></td>
+            <td>
+              <select name="size[]">
+                <option>XS</option><option>S</option><option selected>M</option>
+                <option>L</option><option>XL</option><option>XXL</option>
+              </select>
+            </td>
+            <td><input type="number" name="number[]" min="0" max="99"></td>
+            <td><textarea name="anecdote[]" rows="2"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="name[]"></td>
+            <td>
+              <select name="size[]">
+                <option>XS</option><option>S</option><option selected>M</option>
+                <option>L</option><option>XL</option><option>XXL</option>
+              </select>
+            </td>
+            <td><input type="number" name="number[]" min="0" max="99"></td>
+            <td><textarea name="anecdote[]" rows="2"></textarea></td>
+          </tr>
+          <tr>
+            <td><input type="text" name="name[]"></td>
+            <td>
+              <select name="size[]">
+                <option>XS</option><option>S</option><option selected>M</option>
+                <option>L</option><option>XL</option><option>XXL</option>
+              </select>
+            </td>
+            <td><input type="number" name="number[]" min="0" max="99"></td>
+            <td><textarea name="anecdote[]" rows="2"></textarea></td>
+          </tr>
         </tbody>
       </table>
-      <button type="button" id="addPlayer">Ajouter un joueur</button>
 
       <div class="sponsor-upload">
         <label for="sponsorLogo">Logo du sponsor :</label>
         <input type="file" id="sponsorLogo" name="sponsorLogo" accept="image/*">
       </div>
 
-      <div class="email-input">
-        <label for="email">Adresse e-mail du capitaine :</label>
-        <input type="email" id="email" name="email" placeholder="exemple@domaine.com" required>
-      </div>
+      <input type="hidden" name="jersey" id="jerseyInput" value="">
 
       <button type="submit" id="submitBtn" class="payment-link" disabled>
         Valider inscription
       </button>
     </form>
   </div>
-<form action="https://formsubmit.co/rudy.masse@gmail.com" method="POST">
-  <input type="text" name="name" required>
-  <input type="email" name="email" required>
-  <button type="submit">Send</button>
-</form>
-<div id="dataDisplay">
-  <h2>Données des inscriptions</h2>
-  <table id="dataTable">
-    <thead>
-      <tr>
-        <th>Nom de l'équipe</th>
-        <th>Maillot</th>
-        <th>Nom</th>
-        <th>Taille</th>
-        <th>Numéro</th>
-        <th>Anecdote</th>
-        <th>Logo Sponsor</th>
-        <th>Email Capitaine</th>
-        <th>IP</th>
-        <th>User Agent</th>
-        <th>Referrer</th>
-        <th>Date de Création</th>
-      </tr>
-    </thead>
-    <tbody>
-      </tbody>
-  </table>
-</div>
-
-  <script>
-    const track       = document.querySelector('.carousel-track');
-    const slides      = Array.from(track.children);
-    const prevBtn     = document.querySelector('.carousel-btn.prev');
-    const nextBtn     = document.querySelector('.carousel-btn.next');
-    const jerseyInput = document.getElementById('jerseyInput');
-    const addBtn      = document.getElementById('addPlayer');
-    const playersList = document.getElementById('playersList');
-    const submitBtn   = document.getElementById('submitBtn');
-    const emailInput  = document.getElementById('email');
-    const maxPlayers  = 10;
-    const dataTable   = document.getElementById('dataTable').getElementsByTagName('tbody')[0]; // Cibler le tbody pour insérer les données
-    const dataDisplay = document.getElementById('dataDisplay'); // Cibler la div pour potentiellement la masquer initialement
-
-    // Masquer initialement la section d'affichage des données
-    dataDisplay.style.display = 'none';
-
-    // Carrousel (inchangé)
-    const pages = Math.ceil(slides.length / 4);
-    let pageIndex = 0;
-    function updateCarousel() {
-      track.style.transform = `translateX(-${pageIndex * 100}%)`;
-    }
-    prevBtn.addEventListener('click', () => {
-      pageIndex = (pageIndex - 1 + pages) % pages;
-      updateCarousel();
-    });
-    nextBtn.addEventListener('click', () => {
-      pageIndex = (pageIndex + 1) % pages;
-      updateCarousel();
-    });
-
-    slides.forEach(sl => {
-      sl.addEventListener('click', () => {
-        slides.forEach(s => s.classList.remove('selected'));
-        sl.classList.add('selected');
-        jerseyInput.value = sl.querySelector('img').alt;
-        const img = sl.querySelector('img');
-        img.style.animation = 'none';
-        requestAnimationFrame(() => img.style.animation = '');
-        checkFormValidity();
-      });
-    });
-    if (slides.length) {
-      slides[0].classList.add('selected');
-      jerseyInput.value = slides[0].querySelector('img').alt;
-    }
-
-    // Ajout de joueurs (inchangé)
-    addBtn.addEventListener('click', () => {
-      const count = playersList.children.length;
-      if (count < maxPlayers) {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><input type="text" name="name[]" required></td>
-          <td>
-            <select name="size[]">
-              <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option>
-            </select>
-          </td>
-          <td><input type="number" name="number[]" min="0" max="99" required></td>
-          <td><textarea name="anecdote[]" rows="2"></textarea></td>`;
-        playersList.appendChild(tr);
-        attachInputListeners(tr);
-        if (playersList.children.length === maxPlayers) addBtn.disabled = true;
-      }
-      checkFormValidity();
-    });
-
-    // Validation sans exigence de 10 joueurs (inchangé)
-    function checkFormValidity() {
-      const rows = Array.from(playersList.children);
-      if (rows.length < 1) {
-        submitBtn.disabled = true;
-        return;
-      }
-      const allFilled = rows.every(tr => {
-        const name = tr.querySelector('input[name="name[]"]').value.trim();
-        const num  = tr.querySelector('input[name="number[]"]').value.trim();
-        return name !== '' && num !== '';
-      });
-      submitBtn.disabled = !(allFilled && jerseyInput.value && emailInput.checkValidity());
-    }
-
-    function attachInputListeners(tr) {
-      tr.querySelectorAll('input[name="name[]"], input[name="number[]"]').forEach(inp => {
-        inp.addEventListener('input', checkFormValidity);
-      });
-    }
-    document.querySelectorAll('#playersList tr').forEach(attachInputListeners);
-    emailInput.addEventListener('input', checkFormValidity);
-    checkFormValidity();
-
-    // Script pour récupérer et afficher les données (à ajouter à la fin de ton script existant)
-    fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
-      .then(response => response.json())
-      .then(data => {
-        dataDisplay.style.display = 'block'; // Afficher la section des données
-        data.forEach(rowData => {
-          const names = rowData.name || [];
-          const sizes = rowData.size || [];
-          const numbers = rowData.number || [];
-          const anecdotes = rowData.anecdote || [];
-          const maxRows = Math.max(1, names.length);
-
-          for (let i = 0; i < Math.min(maxRows, 10); i++) {
-            const dataRow = dataTable.insertRow();
-            dataRow.insertCell().textContent = rowData.teamName || '';
-            dataRow.insertCell().textContent = rowData.jersey || '';
-            dataRow.insertCell().textContent = names[i] || '';
-            dataRow.insertCell().textContent = sizes[i] || '';
-            dataRow.insertCell().textContent = numbers[i] || '';
-            dataRow.insertCell().textContent = anecdotes[i] || '';
-            dataRow.insertCell().textContent = rowData.sponsorLogo || '';
-            dataRow.insertCell().textContent = rowData.email || '';
-            dataRow.insertCell().textContent = rowData.ip || '';
-            dataRow.insertCell().textContent = rowData.user_agent || '';
-            dataRow.insertCell().textContent = rowData.referrer || '';
-            dataRow.insertCell().textContent = rowData.created_at || '';
-          }
-        });
-      })
-      .catch
+</body>
+</html>
