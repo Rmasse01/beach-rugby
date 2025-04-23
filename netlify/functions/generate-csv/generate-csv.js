@@ -1,3 +1,6 @@
+const fs = require('fs').promises; // Utilisation de l'API asynchrone de fs
+const path = require('path');
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
@@ -25,16 +28,18 @@ exports.handler = async (event) => {
       const playerNumber = numbers[i] || '';
       const playerAnecdote = anecdotes[i] || '';
 
-      csvString += `<span class="math-inline">\{teamName\},</span>{jersey},"<span class="math-inline">\{playerName\}",</span>{playerSize},<span class="math-inline">\{playerNumber\},"</span>{playerAnecdote}","<span class="math-inline">\{sponsorLogo\}",</span>{email}\n`;
+      csvString += `${teamName},${jersey},"${playerName}","${playerSize}",${playerNumber},"${playerAnecdote}","${sponsorLogo}",${email}\n`;
     }
+
+    const filename = `inscription_${teamName.replace(/\s+/g, '_')}.csv`;
+    const filePath = path.join(__dirname, 'data', filename); // Assurez-vous d'avoir un dossier 'data'
+
+    // Écrire le fichier CSV
+    await fs.writeFile(filePath, csvString, 'utf8');
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'text/csv',
-        'Content-Disposition': `attachment; filename="inscription_${teamName.replace(/\s+/g, '_')}.csv"`,
-      },
-      body: csvString,
+      body: JSON.stringify({ message: `Inscription enregistrée pour ${teamName}` }),
     };
 
   } catch (error) {
