@@ -15,10 +15,10 @@ exports.handler = async (event) => {
     readable.push(event.body);
     readable.push(null); // Indicate end of stream
 
-    const contentType = event.headers['content-type'] || event.headers['Content-Type'];
+    readable.headers = { 'content-type': event.headers['content-type'] || event.headers['Content-Type'] };
 
     return new Promise((resolve, reject) => {
-      form.parse(readable, { httpHeaders: { 'content-type': contentType } }, async (err, fields, files) => {
+      form.parse(readable, async (err, fields, files) => { // Removed httpHeaders option
         if (err) {
           console.error("Error parsing form:", err);
           return resolve({
