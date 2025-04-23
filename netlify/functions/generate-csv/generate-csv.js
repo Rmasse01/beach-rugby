@@ -1,5 +1,5 @@
 const querystring = require('querystring');
-const fs = require('fs').promises; // Utilisation de l'API asynchrone de fs
+const fs = require('fs').promises;
 const path = require('path');
 
 exports.handler = async (event) => {
@@ -9,10 +9,11 @@ exports.handler = async (event) => {
 
   try {
     const formData = querystring.parse(event.body);
+    console.log("formData:", formData); // Ajout de la ligne de log
 
     const teamName = formData.teamName;
     const jersey = formData.jersey;
-    const names = formData['name[]'] || []; // Note le '[]' pour les tableaux
+    const names = formData['name[]'] || [];
     const sizes = formData['size[]'] || [];
     const numbers = formData['number[]'] || [];
     const anecdotes = formData['anecdote[]'] || [];
@@ -32,10 +33,9 @@ exports.handler = async (event) => {
       csvString += `${teamName},${jersey},"${playerName}","${playerSize}",${playerNumber},"${playerAnecdote}","${sponsorLogo}",${email}\n`;
     }
 
-    const filename = `inscription_${teamName.replace(/\s+/g, '_')}.csv`;
-    const filePath = path.join(__dirname, 'data', filename); // Assurez-vous d'avoir un dossier 'data'
+    const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
+    const filePath = path.join(__dirname, 'data', filename);
 
-    // Écrire le fichier CSV
     await fs.writeFile(filePath, csvString, 'utf8');
 
     return {
