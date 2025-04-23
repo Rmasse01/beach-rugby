@@ -1,3 +1,4 @@
+const querystring = require('querystring');
 const fs = require('fs').promises; // Utilisation de l'API asynchrone de fs
 const path = require('path');
 
@@ -7,16 +8,16 @@ exports.handler = async (event) => {
   }
 
   try {
-    const data = JSON.parse(event.body);
+    const formData = querystring.parse(event.body);
 
-    const teamName = data.teamName;
-    const jersey = data.jersey;
-    const names = data.name || [];
-    const sizes = data.size || [];
-    const numbers = data.number || [];
-    const anecdotes = data.anecdote || [];
-    const sponsorLogo = data.sponsorLogo || '';
-    const email = data.email;
+    const teamName = formData.teamName;
+    const jersey = formData.jersey;
+    const names = formData['name[]'] || []; // Note le '[]' pour les tableaux
+    const sizes = formData['size[]'] || [];
+    const numbers = formData['number[]'] || [];
+    const anecdotes = formData['anecdote[]'] || [];
+    const sponsorLogo = formData.sponsorLogo || '';
+    const email = formData.email;
 
     let csvString = "Nom de l'équipe,Maillot,Nom,Taille,Numéro,Anecdote,Logo Sponsor,Email Capitaine\n";
 
