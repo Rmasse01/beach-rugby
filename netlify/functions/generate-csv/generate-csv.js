@@ -1,6 +1,7 @@
 const formidable = require('formidable');
 const fs = require('fs').promises;
 const path = require('path');
+const { Readable } = require('stream');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -10,8 +11,14 @@ exports.handler = async (event) => {
   try {
     const form = new formidable.IncomingForm();
 
+    const readable = new Readable();
+    readable.push(event.body);
+    readable.push(null); // Indicate end of stream
+
+    const contentType = event.headers['content-type'] || event.headers['Content-Type'];
+
     return new Promise((resolve, reject) => {
-      form.parse(event, async (err, fields, files) => {
+      form.parse(readable, { httpHeaders: { 'content-type': contentType } }, async (err, fields, files) => {
         if (err) {
           console.error("Error parsing form:", err);
           return resolve({
@@ -20,8 +27,8 @@ exports.handler = async (event) => {
           });
         }
 
-        console.log("fields:", fields); // Les champs du formulaire
-        console.log("files:", files);   // Les fichiers uploadés (sponsorLogo)
+        console.log("fields:", fields);
+        console.log("files:", files);
 
         const teamName = fields.teamName;
         const jersey = fields.jersey;
@@ -29,8 +36,7 @@ exports.handler = async (event) => {
         const sizes = fields['size[]'] || [];
         const numbers = fields['number[]'] || [];
         const anecdotes = fields['anecdote[]'] || [];
-        const sponsorLogo = files.sponsorLogo?.originalFilename || ''; // Nom du fichier
-
+        const sponsorLogo = files.sponsorLogo?.originalFilename || '';
         const email = fields.email;
 
         let csvString = "Nom de l'équipe,Maillot,Nom,Taille,Numéro,Anecdote,Logo Sponsor,Email Capitaine\n";
