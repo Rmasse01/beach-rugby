@@ -206,7 +206,6 @@
 
   <script>
     // Sélection des éléments du DOM
-    const registrationForm = document.getElementById('registrationForm');
     const jerseyInput = document.getElementById('jerseyInput');
     const addBtn      = document.getElementById('addPlayer');
     const playersList = document.getElementById('playersList');
@@ -214,6 +213,7 @@
     const emailInput  = document.getElementById('email');
     const dataTable   = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
     const dataDisplay = document.getElementById('dataDisplay');
+    const registrationForm = document.getElementById('registrationForm');
 
     // Masquer initialement la section d'affichage des données
     dataDisplay.style.display = 'none';
@@ -284,38 +284,43 @@
       checkFormValidity();
     });
 
-    // Gestion de la soumission du formulaire via Fetch
-    registrationForm.addEventListener('submit', (event) => {
-      event.preventDefault(); // Empêcher la soumission par défaut
-
-      const formData = new FormData(registrationForm);
-
-      fetch(registrationForm.action, {
-        method: 'POST',
-        body: formData
-      })
+    // Script pour récupérer et afficher les données (avec gestion d'erreur améliorée)
+    fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
       .then(response => response.json())
       .then(data => {
-        if (response.ok) {
-          alert(data.message); // Afficher un message de succès
-          registrationForm.reset(); // Réinitialiser le formulaire
-          // Réinitialiser la sélection du maillot
-          document.querySelectorAll('.simple-carousel img').forEach(img => img.classList.remove('selected'));
-          const firstJersey = document.querySelector('.simple-carousel img:first-child');
-          if (firstJersey) {
-            firstJersey.classList.add('selected');
-            jerseyInput.value = firstJersey.alt;
-          }
-          checkFormValidity(); // Réactiver potentiellement le bouton de soumission
+        dataDisplay.style.display = 'block'; // Afficher la section des données
+        if (data && data.length > 0) {
+          data.forEach(rowData => {
+            const names = rowData.name || [];
+            const sizes = rowData.size || [];
+            const numbers = rowData.number || [];
+            const anecdotes = rowData.anecdote || [];
+            const maxRows = Math.max(1, names.length);
+
+            for (let i = 0; i < Math.min(maxRows, 10); i++) {
+              const dataRow = dataTable.insertRow();
+              dataRow.insertCell().textContent = rowData.teamName || '';
+              dataRow.insertCell().textContent = rowData.jersey || '';
+              dataRow.insertCell().textContent = names[i] || '';
+              dataRow.insertCell().textContent = sizes[i] || '';
+              dataRow.insertCell().textContent = numbers[i] || '';
+              dataRow.insertCell().textContent = anecdotes[i] || '';
+              dataRow.insertCell().textContent = rowData.sponsorLogo || '';
+              dataRow.insertCell().textContent = rowData.email || '';
+              dataRow.insertCell().textContent = rowData.ip || '';
+              dataRow.insertCell().textContent = rowData.user_agent || '';
+              dataRow.insertCell().textContent = rowData.referrer || '';
+              dataRow.insertCell().textContent = rowData.created_at || '';
+            }
+          });
         } else {
-          alert(data.error); // Afficher un message d'erreur
+          dataDisplay.innerHTML = '<p>Aucune inscription n\'a été trouvée pour le moment.</p>';
         }
       })
       .catch(error => {
-        console.error("Erreur lors de l'envoi du formulaire:", error);
-        alert("Une erreur s'est produite lors de l'envoi du formulaire.");
+        console.error("Erreur lors de la récupération des données:", error);
+        dataDisplay.innerHTML = '<p>Erreur lors du chargement des inscriptions.</p>';
       });
-    });
 
     // Script pour récupérer et afficher les données (avec gestion d'erreur améliorée)
     fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
