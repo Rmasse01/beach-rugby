@@ -1,6 +1,7 @@
 const formidable = require('formidable');
 const fs = require('fs').promises;
 const path = require('path');
+const { Readable } = require('stream');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -10,8 +11,15 @@ exports.handler = async (event) => {
   try {
     const form = new formidable.IncomingForm();
 
+    const req = new Readable();
+    req.push(event.body);
+    req.push(null);
+
+    req.headers = { 'content-type': event.headers['content-type'] || event.headers['Content-Type'] };
+    req.method = event.httpMethod; // Simulate request method
+
     return new Promise((resolve, reject) => {
-      form.parse(event, async (err, fields, files) => { // Passing the 'event' object directly
+      form.parse(req, async (err, fields, files) => { // Passing our simulated 'req'
         if (err) {
           console.error("Error parsing form:", err);
           return resolve({
