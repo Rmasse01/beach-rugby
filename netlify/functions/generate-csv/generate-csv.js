@@ -1,32 +1,42 @@
-const formidable = require('formidable');
+const Busboy = require('busboy');
 const fs = require('fs').promises;
 const path = require('path');
-const { Readable } = require('stream');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  try {
-    const form = new formidable.IncomingForm();
+  return new Promise((resolve, reject) => {
+    const busboy = new Busboy({ headers: event.headers });
+    const fields = {};
+    const files = {};
+    const fileWrites = [];
 
-    const req = new Readable();
-    req.push(event.body);
-    req.push(null);
+    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+      const filepath = path.join(__dirname, 'data', filename);
+      const writeStream = fs.createWriteStream(filepath);
+      file.pipe(writeStream);
+      fileWrites.push(new Promise((res, rej) => {
+        writeStream.on('finish', () => res(filepath));
+        writeStream.on('error', rej);
+      }));
+      files[fieldname] = { originalFilename: filename, path: filepath, mimetype };
+    });
 
-    req.headers = { 'content-type': event.headers['content-type'] || event.headers['Content-Type'] };
-    req.method = event.httpMethod; // Simulate request method
+    busboy.on('field', (fieldname, val) => {
+      if (fields[fieldname] && Array.isArray(fields[fieldname])) {
+        fields[fieldname].push(val);
+      } else if (fields[fieldname]) {
+        fields[fieldname] = [fields[fieldname], val];
+      } else {
+        fields[fieldname] = val;
+      }
+    });
 
-    return new Promise((resolve, reject) => {
-      form.parse(req, async (err, fields, files) => { // Passing our simulated 'req'
-        if (err) {
-          console.error("Error parsing form:", err);
-          return resolve({
-            statusCode: 500,
-            body: JSON.stringify({ error: 'Failed to parse form data' }),
-          });
-        }
+    busboy.on('finish', async () => {
+      try {
+        await Promise.all(fileWrites);
 
         console.log("fields:", fields);
         console.log("files:", files);
@@ -60,14 +70,18 @@ exports.handler = async (event) => {
           statusCode: 200,
           body: JSON.stringify({ message: `Inscription enregistrée pour ${teamName}` }),
         });
-      });
+
+      } catch (error) {
+        console.error("Error processing form with busboy:", error);
+        resolve({ statusCode: 500, body: JSON.stringify({ error: 'Failed to process form data' }) });
+      }
     });
 
-  } catch (error) {
-    console.error("Error processing form submission:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to process submission' }),
-    };
-  }
+    busboy.on('error', (error) => {
+      console.error("Busboy error:", error);
+      resolve({ statusCode: 500, body: JSON.stringify({ error: 'Failed to parse form data' }) });
+    });
+
+    busboy.write(event.body, event.isBase64Encoded ? 'base64' : 'binary');
+  });
 };
