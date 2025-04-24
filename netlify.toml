@@ -1,9 +1,10 @@
 [build]
   functions = "netlify/functions"
   publish = "/" # Ou le répertoire où se trouve ton site HTML
+  command = "npm install && npm run netlify:functions"
 
 [functions]
   directory = "netlify/functions"
 
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
+[scripts]
+  netlify:functions = "cd netlify/functions && npm install"
