@@ -1,4 +1,6 @@
-
 [build]
   functions = "netlify/functions"
+  publish = "/" # Ou le répertoire où se trouve ton site HTML (si différent de la racine)
 
+[functions]
+  directory = "netlify/functions"
