@@ -1,7 +1,6 @@
 const formidable = require('formidable');
 const fs = require('fs').promises;
 const path = require('path');
-const { Transform } = require('stream');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -11,20 +10,8 @@ exports.handler = async (event) => {
   try {
     const form = new formidable.IncomingForm();
 
-    const transformStream = new Transform({
-      transform(chunk, encoding, callback) {
-        this.push(chunk);
-        callback();
-      },
-    });
-
-    transformStream.push(event.body);
-    transformStream.push(null); // Indicate end of stream
-
-    transformStream.headers = { 'content-type': event.headers['content-type'] || event.headers['Content-Type'] };
-
     return new Promise((resolve, reject) => {
-      form.parse(transformStream, async (err, fields, files) => {
+      form.parse(event, async (err, fields, files) => { // Passing the 'event' object directly
         if (err) {
           console.error("Error parsing form:", err);
           return resolve({
