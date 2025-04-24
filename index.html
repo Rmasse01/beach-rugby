@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <title>Inscription – Occitan Beach Rugby</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-
   <style>
     :root {
       --color-bg:      #F9E6D3;
@@ -17,7 +15,6 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; font-family: 'Poppins', sans-serif; color: var(--text-color); background: var(--color-bg); text-align: center; }
-
     header {
       position: fixed; top: 0; left: 0;
       width: 100%; height: 100vh;
@@ -30,30 +27,25 @@
       color: white; font-size: 2.5em; font-weight: 600;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
     }
-
     .container {
       position: relative; z-index: 1;
       width: 100%; margin-top: 100vh;
       padding: 20px; background: var(--color-bg);
     }
-
     h2 { margin-bottom: 16px; }
     label { display: block; margin: 12px 0 4px; font-weight: 500; }
     h3.choose-left { text-align: left; margin: 24px 0 12px 20px; }
-
     input, select, textarea {
       width: 80%; max-width: 400px;
       padding: 8px; margin: 4px auto 16px;
       border: 1px solid var(--color-primary); border-radius: 4px;
       font-size: 1em; text-align: left;
     }
-
     @keyframes pulse {
       0%   { transform: scale(1); }
       50%  { transform: scale(1.1); }
       100% { transform: scale(1); }
     }
-
     .carousel-wrapper { position: relative; margin: 24px 0; }
     .carousel-track-container { overflow: hidden; }
     .carousel-track {
@@ -76,7 +68,6 @@
     }
     .carousel-btn.prev { left: 8px; }
     .carousel-btn.next { right: 8px; }
-
     table {
       width: 90%; margin: auto; border-collapse: collapse; margin-bottom: 16px;
     }
@@ -84,11 +75,8 @@
       border: 1px solid var(--color-primary); padding: 8px; text-align: left;
     }
     th { background: var(--color-panel); font-weight: 600; }
-
-    button, .payment-link {
-      font-family: inherit; font-size: 1em; cursor: pointer;
-    }
     button {
+      font-family: inherit; font-size: 1em; cursor: pointer;
       padding: 10px 16px; margin-bottom: 24px;
       background: var(--color-accent); color: #fff;
       border: none; border-radius: 4px;
@@ -99,9 +87,7 @@
       color: #fff; text-decoration: none; font-weight: 600;
       border-radius: 6px; margin-bottom: 40px;
     }
-
     .sponsor-upload, .email-input { margin: 24px 0; }
-
     @media (max-width: 768px) {
       header h1 { font-size: 2em; }
       .carousel-track .slide { min-width: 50%; }
@@ -117,7 +103,6 @@
       td:nth-of-type(3)::before { content: "Numéro"; }
       td:nth-of-type(4)::before { content: "Anecdote joueur"; }
     }
-
     /* Styles pour le carrousel simple */
     .simple-carousel { display:flex; overflow-x:auto; margin:20px 0; }
     .simple-carousel img {
@@ -188,17 +173,13 @@
       <a href="https://www.helloasso.com/" target="_blank" class="payment-link">
         Payer via HelloAsso
       </a>
-  
-      <button type="submit" id="submitBtn" class="payment-link" disabled>
+
+      <button type="submit" id="submitBtn" disabled>
         Valider inscription
       </button>
     </form>
   </div>
-<form action="https://formsubmit.co/rudy.masse@gmail.com" method="POST">
-  <input type="text" name="name" required>
-  <input type="email" name="email" required>
-  <button type="submit">Send</button>
-</form>
+
 <div id="dataDisplay">
   <h2>Données des inscriptions</h2>
   <table id="dataTable">
@@ -225,6 +206,7 @@
 
   <script>
     // Sélection des éléments du DOM
+    const registrationForm = document.getElementById('registrationForm');
     const jerseyInput = document.getElementById('jerseyInput');
     const addBtn      = document.getElementById('addPlayer');
     const playersList = document.getElementById('playersList');
@@ -245,7 +227,7 @@
       checkFormValidity();
     }
 
-    // Fonction pour la validation du formulaire (à adapter selon tes besoins)
+    // Fonction pour la validation du formulaire côté client
     function checkFormValidity() {
       const selectedJersey = document.querySelector('.simple-carousel img.selected');
       const teamNameInput = document.getElementById('teamName');
@@ -278,7 +260,7 @@
       checkFormValidity();
     });
 
-    // Attacher les listeners d'input aux champs de joueur pour la validation
+    // Attacher les listeners d'input aux champs de joueur pour la validation côté client
     function attachPlayerInputListeners(row) {
       const inputs = row.querySelectorAll('input[type="text"][name="name[]"], input[type="number"][name="number[]"]');
       inputs.forEach(input => {
@@ -286,53 +268,70 @@
       });
     }
 
-    // Attacher les listeners d'input aux joueurs existants au chargement
+    // Attacher les listeners d'input aux joueurs existants au chargement pour la validation côté client
     playersList.querySelectorAll('tr').forEach(attachPlayerInputListeners);
 
-    // Validation de l'email
+    // Validation de l'email côté client
     emailInput.addEventListener('input', checkFormValidity);
 
-    // Sélection du premier maillot au chargement
+    // Sélection du premier maillot au chargement et validation initiale
     document.addEventListener('DOMContentLoaded', () => {
       const firstJersey = document.querySelector('.simple-carousel img:first-child');
       if (firstJersey) {
         firstJersey.classList.add('selected');
         jerseyInput.value = firstJersey.alt;
-        checkFormValidity();
       }
-      checkFormValidity(); // Vérification initiale de la validité du formulaire
+      checkFormValidity();
     });
 
-    // Script pour récupérer et afficher les données (inchangé)
+    // Gestion de la soumission du formulaire via Fetch
+    registrationForm.addEventListener('submit', (event) => {
+      event.preventDefault(); // Empêcher la soumission par défaut
+
+      const formData = new FormData(registrationForm);
+
+      fetch(registrationForm.action, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (response.ok) {
+          alert(data.message); // Afficher un message de succès
+          registrationForm.reset(); // Réinitialiser le formulaire
+          // Réinitialiser la sélection du maillot
+          document.querySelectorAll('.simple-carousel img').forEach(img => img.classList.remove('selected'));
+          const firstJersey = document.querySelector('.simple-carousel img:first-child');
+          if (firstJersey) {
+            firstJersey.classList.add('selected');
+            jerseyInput.value = firstJersey.alt;
+          }
+          checkFormValidity(); // Réactiver potentiellement le bouton de soumission
+        } else {
+          alert(data.error); // Afficher un message d'erreur
+        }
+      })
+      .catch(error => {
+        console.error("Erreur lors de l'envoi du formulaire:", error);
+        alert("Une erreur s'est produite lors de l'envoi du formulaire.");
+      });
+    });
+
+    // Script pour récupérer et afficher les données (avec gestion d'erreur améliorée)
     fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
       .then(response => response.json())
       .then(data => {
         dataDisplay.style.display = 'block'; // Afficher la section des données
-        data.forEach(rowData => {
-          const names = rowData.name || [];
-          const sizes = rowData.size || [];
-          const numbers = rowData.number || [];
-          const anecdotes = rowData.anecdote || [];
-          const maxRows = Math.max(1, names.length);
+        if (data && data.length > 0) {
+          data.forEach(rowData => {
+            const names = rowData.name || [];
+            const sizes = rowData.size || [];
+            const numbers = rowData.number || [];
+            const anecdotes = rowData.anecdote || [];
+            const maxRows = Math.max(1, names.length);
 
-          for (let i = 0; i < Math.min(maxRows, 10); i++) {
-            const dataRow = dataTable.insertRow();
-            dataRow.insertCell().textContent = rowData.teamName || '';
-            dataRow.insertCell().textContent = rowData.jersey || '';
-            dataRow.insertCell().textContent = names[i] || '';
-            dataRow.insertCell().textContent = sizes[i] || '';
-            dataRow.insertCell().textContent = numbers[i] || '';
-            dataRow.insertCell().textContent = anecdotes[i] || '';
-            dataRow.insertCell().textContent = rowData.sponsorLogo || '';
-            dataRow.insertCell().textContent = rowData.email || '';
-            dataRow.insertCell().textContent = rowData.ip || '';
-            dataRow.insertCell().textContent = rowData.user_agent || '';
-            dataRow.insertCell().textContent = rowData.referrer || '';
-            dataRow.insertCell().textContent = rowData.created_at || '';
-          }
-        });
-      })
-      .catch(error => console.error("Erreur lors de la récupération des données:", error));
-  </script>
-</body>
-</html>
+            for (let i = 0; i < Math.min(maxRows, 10); i++) {
+              const dataRow = dataTable.insertRow();
+              dataRow.insertCell().textContent = rowData.teamName || '';
+              dataRow.insertCell().textContent = rowData.jersey || '';
+              data
