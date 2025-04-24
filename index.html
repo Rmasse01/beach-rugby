@@ -219,13 +219,13 @@
     dataDisplay.style.display = 'none';
 
     // Fonction pour gérer la sélection du maillot
-    function selectJersey(el) {
+    window.selectJersey = function(el) { // Définition dans la portée globale
       document.querySelectorAll('.simple-carousel img')
           .forEach(i => i.classList.remove('selected'));
       el.classList.add('selected');
       jerseyInput.value = el.alt;
       checkFormValidity();
-    }
+    };
 
     // Fonction pour la validation du formulaire côté client
     function checkFormValidity() {
@@ -244,7 +244,7 @@
     }
 
     // Ajout dynamique de joueurs
-    addBtn.addEventListener('click', () => {
+    const addPlayerHandler = () => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td><input type="text" name="name[]" required></td>
@@ -258,7 +258,9 @@
       playersList.appendChild(tr);
       attachPlayerInputListeners(tr);
       checkFormValidity();
-    });
+    };
+
+    addBtn.addEventListener('click', addPlayerHandler);
 
     // Attacher les listeners d'input aux champs de joueur pour la validation côté client
     function attachPlayerInputListeners(row) {
@@ -321,22 +323,6 @@
         console.error("Erreur lors de la récupération des données:", error);
         dataDisplay.innerHTML = '<p>Erreur lors du chargement des inscriptions.</p>';
       });
-
-    // Script pour récupérer et afficher les données (avec gestion d'erreur améliorée)
-    fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
-      .then(response => response.json())
-      .then(data => {
-        dataDisplay.style.display = 'block'; // Afficher la section des données
-        if (data && data.length > 0) {
-          data.forEach(rowData => {
-            const names = rowData.name || [];
-            const sizes = rowData.size || [];
-            const numbers = rowData.number || [];
-            const anecdotes = rowData.anecdote || [];
-            const maxRows = Math.max(1, names.length);
-
-            for (let i = 0; i < Math.min(maxRows, 10); i++) {
-              const dataRow = dataTable.insertRow();
-              dataRow.insertCell().textContent = rowData.teamName || '';
-              dataRow.insertCell().textContent = rowData.jersey || '';
-              data
+  </script>
+</body>
+</html>
