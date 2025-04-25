@@ -24,7 +24,7 @@ exports.handler = async (event) => {
 
     if (sponsorLogoFile && sponsorLogoFile.filename && sponsorLogoFile.content) {
       sponsorLogoFilename = sponsorLogoFile.filename;
-      sponsorLogoAttachment = new mailgun.Attachment({
+      sponsorLogoAttachment = new Mailgun.Attachment({
         data: Buffer.from(sponsorLogoFile.content, 'base64'),
         filename: sponsorLogoFilename,
         contentType: sponsorLogoFile.contentType,
