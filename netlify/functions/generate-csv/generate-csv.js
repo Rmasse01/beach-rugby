@@ -34,7 +34,7 @@ exports.handler = async (event) => {
       const playerSize = sizes[i] || '';
       const playerNumber = numbers[i] || '';
       const playerAnecdote = anecdotes[i] || '';
-      csvString += `<span class="math-inline">\{teamName\},</span>{jersey},"<span class="math-inline">\{playerName\}","</span>{playerSize}",<span class="math-inline">\{playerNumber\},"</span>{playerAnecdote}","<span class="math-inline">\{sponsorLogoFilename\}",</span>{email}\n`;
+      csvString += `${teamName},${jersey},"${playerName}","${playerSize}",${playerNumber},"${playerAnecdote}","${sponsorLogoFilename}",${email}\n`;
     }
 
     const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
@@ -59,4 +59,14 @@ exports.handler = async (event) => {
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: `Inscription
+      body: JSON.stringify({ message: `Inscription enregistrée pour ${teamName}. Un email avec les données CSV a été envoyé à rudy.masse@gmail.com` }),
+    };
+
+  } catch (error) {
+    console.error("Error processing form or sending email:", error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Failed to process form or send email' }),
+    };
+  }
+};
