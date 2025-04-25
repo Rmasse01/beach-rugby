@@ -1,7 +1,6 @@
 const parser = require('lambda-multipart-parser');
 const formData = require('form-data');
-const Mailgun = require('mailgun-js');
-const mailgun = Mailgun({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN });
+const Mailgun = require('mailgun-js')({ apiKey: process.env.MAILGUN_API_KEY, domain: process.env.MAILGUN_DOMAIN });
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -14,12 +13,11 @@ exports.handler = async (event) => {
 
     const teamName = result.teamName;
     const jersey = result.jersey;
-    const names = result.name || [];
-    const sizes = result.size || [];
-    const numbers = result.number || [];
-    const anecdotes = result.anecdote || [];
-    const sponsorLogoFile = result.sponsorLogo;
-    const email = result.email;
+    const names = result['name[]'] || []; // Accès au tableau des noms
+    const sizes = result['size[]'] || [];   // Accès au tableau des tailles
+    const numbers = result['number[]'] || []; // Accès au tableau des numéros
+    const anecdotes = result['anecdote[]'] || []; // Accès au tableau des anecdotes
+    const sponsorLogoFile = result.files[0]; // Le fichier est dans un tableau
 
     let sponsorLogoFilename = '';
     let sponsorLogoAttachment = null;
