@@ -39,7 +39,8 @@ exports.handler = async (event) => {
       const playerSize = sizes[i] || '';
       const playerNumber = numbers[i] || '';
       const playerAnecdote = anecdotes[i] || '';
-      csvString += `${teamName},${jersey},"${playerName}","${playerSize}",${playerNumber},"${playerAnecdote}","${sponsorLogoFilename}",${email}\n`;
+      const captainEmail = result.email || ''; // Accès à l'e-mail depuis result
+      csvString += `${teamName},${jersey},"${playerName}","${playerSize}",${playerNumber},"${playerAnecdote}","${sponsorLogoFilename}",${captainEmail}\n`;
     }
 
     const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
