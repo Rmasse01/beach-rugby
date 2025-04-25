@@ -1,11 +1,12 @@
 const parser = require('lambda-multipart-parser');
-const fs = require('fs').promises;
-const path = require('path');
+const sgMail = require('@sendgrid/mail');
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
+
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY); // Utiliser une variable d'environnement pour la clé API
 
   try {
     const result = await parser.parse(event);
@@ -17,15 +18,12 @@ exports.handler = async (event) => {
     const sizes = result.size || [];
     const numbers = result.number || [];
     const anecdotes = result.anecdote || [];
-    const sponsorLogoFile = result.sponsorLogo; // This will be an object with file info
+    const sponsorLogoFile = result.sponsorLogo;
     const email = result.email;
 
     let sponsorLogoFilename = '';
     if (sponsorLogoFile && sponsorLogoFile.filename) {
       sponsorLogoFilename = sponsorLogoFile.filename;
-      const filepath = path.join(__dirname, sponsorLogoFilename); // Save in function directory
-      await fs.writeFile(filepath, Buffer.from(sponsorLogoFile.content, 'base64'));
-      console.log("Sponsor logo saved to:", filepath);
     }
 
     let csvString = "Nom de l'équipe,Maillot,Nom,Taille,Numéro,Anecdote,Logo Sponsor,Email Capitaine\n";
@@ -36,24 +34,29 @@ exports.handler = async (event) => {
       const playerSize = sizes[i] || '';
       const playerNumber = numbers[i] || '';
       const playerAnecdote = anecdotes[i] || '';
-      csvString += `${teamName},${jersey},"${playerName}","${playerSize}",${playerNumber},"${playerAnecdote}","${sponsorLogoFilename}",${email}\n`;
+      csvString += `<span class="math-inline">\{teamName\},</span>{jersey},"<span class="math-inline">\{playerName\}","</span>{playerSize}",<span class="math-inline">\{playerNumber\},"</span>{playerAnecdote}","<span class="math-inline">\{sponsorLogoFilename\}",</span>{email}\n`;
     }
 
     const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
-    const filePath = path.join(__dirname, filename);
+    const base64CSV = Buffer.from(csvString).toString('base64');
 
-    await fs.writeFile(filePath, csvString, 'utf8');
+    const msg = {
+      to: 'rudy.masse@gmail.com', // Ton adresse email
+      from: email, // L'email du capitaine comme expéditeur (peut nécessiter une configuration spécifique chez SendGrid)
+      subject: `Nouvelle inscription pour l'équipe ${teamName}`,
+      text: `Ci-joint le fichier CSV des inscriptions de l'équipe ${teamName}.`,
+      attachments: [
+        {
+          content: base64CSV,
+          filename: filename,
+          type: 'text/csv',
+          disposition: 'attachment',
+        },
+      ],
+    };
+
+    await sgMail.send(msg);
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: `Inscription enregistrée pour ${teamName}` }),
-    };
-
-  } catch (error) {
-    console.error("Error processing form:", error);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to process form data' }),
-    };
-  }
-};
+      body: JSON.stringify({ message: `Inscription

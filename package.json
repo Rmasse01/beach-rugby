@@ -2,6 +2,7 @@
   "name": "beach-rugby",
   "version": "1.0.0",
   "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
     "busboy": "^1.6.0",
     "formidable": "3.5.4",
     "lambda-multipart-parser": "^1.0.1"
