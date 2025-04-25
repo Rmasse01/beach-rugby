@@ -1,40 +1,4 @@
-const Busboy = require('busboy');
-const fs = require('fs').promises;
-const path = require('path');
-
-exports.handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
-  }
-
-  return new Promise((resolve, reject) => {
-    const busboy = new Busboy({ headers: event.headers });
-    const fields = {};
-    const files = {};
-    const fileWrites = [];
-
-    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
-      const filepath = path.join(__dirname, 'data', filename);
-      const writeStream = fs.createWriteStream(filepath);
-      file.pipe(writeStream);
-      fileWrites.push(new Promise((res, rej) => {
-        writeStream.on('finish', () => res(filepath));
-        writeStream.on('error', rej);
-      }));
-      files[fieldname] = { originalFilename: filename, path: filepath, mimetype };
-    });
-
-    busboy.on('field', (fieldname, val) => {
-      if (fields[fieldname] && Array.isArray(fields[fieldname])) {
-        fields[fieldname].push(val);
-      } else if (fields[fieldname]) {
-        fields[fieldname] = [fields[fieldname], val];
-      } else {
-        fields[fieldname] = val;
-      }
-    });
-
-    busboy.on('finish', async () => {
+busboy.on('finish', async () => {
       try {
         await Promise.all(fileWrites);
 
@@ -62,7 +26,8 @@ exports.handler = async (event) => {
         }
 
         const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
-        const filePath = path.join(__dirname, 'data', filename);
+        // Removed path.join(__dirname, 'data', filename)
+        const filePath = path.join(__dirname, filename); // Using current directory
 
         await fs.writeFile(filePath, csvString, 'utf8');
 
