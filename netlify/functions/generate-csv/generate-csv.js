@@ -44,7 +44,7 @@ exports.handler = async (event) => {
     }
 
     const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
-    const csvAttachment = new mailgun.Attachment({ data: Buffer.from(csvString), filename: filename, contentType: 'text/csv' });
+    const csvAttachment = new Mailgun.Attachment({ data: Buffer.from(csvString), filename: filename, contentType: 'text/csv' });
 
     const attachments = [csvAttachment];
     if (sponsorLogoAttachment) {
@@ -59,7 +59,7 @@ exports.handler = async (event) => {
       attachment: attachments,
     };
 
-    await mailgun.messages().send(data);
+    await Mailgun.messages().send(data);
 
     return {
       statusCode: 200,
