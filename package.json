@@ -5,7 +5,8 @@
     "@sendgrid/mail": "^8.1.5",
     "busboy": "^1.6.0",
     "formidable": "3.5.4",
-    "lambda-multipart-parser": "^1.0.1"
+    "lambda-multipart-parser": "^1.0.1",
+    "mailgun-js": "^0.22.0"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.10.7"
