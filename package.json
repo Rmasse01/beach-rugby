@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "dependencies": {
     "busboy": "^1.6.0",
-    "formidable": "3.5.4"
+    "formidable": "3.5.4",
+    "lambda-multipart-parser": "^1.0.1"
   },
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.10.7"
