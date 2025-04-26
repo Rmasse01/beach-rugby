@@ -31,17 +31,16 @@ exports.handler = async (event) => {
       });
     }
 
-    let csvString = "Nom de l'équipe,Maillot,Nom,Taille,Numéro,Anecdote,Logo Sponsor,Email Capitaine\n";
+    let csvString = "Nom de l'équipe,Maillot,Noms,Tailles,Numéros,Anecdotes,Logo Sponsor,Email Capitaine\n";
     const numPlayers = Math.max(names.length, sizes.length, numbers.length, anecdotes.length);
 
-    for (let i = 0; i < numPlayers; i++) {
-      const playerName = names[i] || '';
-      const playerSize = sizes[i] || '';
-      const playerNumber = numbers[i] || '';
-      const playerAnecdote = anecdotes[i] || '';
-      const captainEmail = result.email || ''; // Accès à l'e-mail depuis result
-      csvString += `${teamName},${jersey},"${playerName}","${playerSize}",${playerNumber},"${playerAnecdote}","${sponsorLogoFilename}",${captainEmail}\n`;
-    }
+    const allNames = names.map(name => `"${name}"`).join(';');
+    const allSizes = sizes.join(';');
+    const allNumbers = numbers.join(';');
+    const allAnecdotes = anecdotes.map(anecdote => `"${anecdote}"`).join(';');
+    const captainEmail = result.email || '';
+
+    csvString += `${teamName},${jersey},${allNames},${allSizes},${allNumbers},${allAnecdotes},"${sponsorLogoFilename}",${captainEmail}\n`;
 
     const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
     const csvAttachment = new Mailgun.Attachment({ data: Buffer.from(csvString), filename: filename, contentType: 'text/csv' });
