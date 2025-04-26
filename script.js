@@ -1,8 +1,10 @@
+// Sélection des éléments DOM
 const jerseyInput = document.getElementById('jerseyInput');
 const addBtn = document.getElementById('addPlayer');
 const playersList = document.getElementById('playersList');
 const submitBtn = document.getElementById('submitBtn');
 const emailInput = document.getElementById('email');
+const dataTable = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
 const dataDisplay = document.getElementById('dataDisplay');
 const registrationForm = document.getElementById('registrationForm');
 const carouselTrack = document.getElementById('jerseyCarouselTrack');
@@ -11,15 +13,19 @@ const nextBtn = document.querySelector('.carousel-btn.next');
 let slides;
 let slideWidth;
 let currentIndex = 0;
-let isJerseySelected = false; // Variable pour suivre l'état de la sélection du maillot
+const errorMessage = document.createElement('div');
+errorMessage.classList.add('error-message');
+document.querySelector('.carousel-wrapper').appendChild(errorMessage);
 
 // Masquer initialement la section d'affichage des données
 dataDisplay.style.display = 'none';
 
+// Fonction de mise à jour de la position du carrousel
 function setSlidePosition(slide, index) {
   slide.style.left = slideWidth * index + 'px';
 }
 
+// Mise à jour du carrousel
 function updateCarousel(newIndex) {
   const newPosition = newIndex * -slideWidth;
   carouselTrack.style.transform = 'translateX(' + newPosition + 'px)';
@@ -27,45 +33,38 @@ function updateCarousel(newIndex) {
   updateSelectedJersey(slides[currentIndex].querySelector('img'));
 }
 
+// Fonction pour passer à la slide suivante
 function nextSlide() {
   if (currentIndex < (slides ? slides.length - 1 : 0)) {
     updateCarousel(currentIndex + 1);
   }
 }
 
+// Fonction pour revenir à la slide précédente
 function prevSlide() {
   if (currentIndex > 0) {
     updateCarousel(currentIndex - 1);
   }
 }
 
+// Mise à jour de l'image du maillot sélectionné
 function updateSelectedJersey(el) {
   document.querySelectorAll('.carousel-track img').forEach(img => {
     img.classList.remove('selected');
   });
   el.classList.add('selected');
   jerseyInput.value = el.alt;
-  isJerseySelected = true; // Le maillot a été sélectionné
+  errorMessage.textContent = ''; // Effacer le message d'erreur
   checkFormValidity();
-}
-
-// Affichage de message d'erreur si le maillot n'est pas sélectionné
-function displayJerseyError() {
-  const errorMsg = document.getElementById('jerseyError');
-  if (!isJerseySelected) {
-    errorMsg.style.display = 'block';
-  } else {
-    errorMsg.style.display = 'none';
-  }
 }
 
 // Initialisation du carrousel après le chargement du DOM
 document.addEventListener('DOMContentLoaded', () => {
   slides = Array.from(carouselTrack.children);
   if (slides.length > 0) {
-    slideWidth = slides[0].getBoundingClientRect().width; // Calculer après le chargement
+    slideWidth = slides[0].getBoundingClientRect().width;
     slides.forEach(setSlidePosition);
-    carouselTrack.style.transform = 'translateX(0)'; // Initialiser à la première slide
+    carouselTrack.style.transform = 'translateX(0)';
     const firstSlideImg = document.querySelector('.carousel-track .slide:first-child img');
     if (firstSlideImg) {
       firstSlideImg.classList.add('selected');
@@ -73,15 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   checkFormValidity();
-  displayJerseyError(); // Vérifier si le maillot est sélectionné
 });
 
-// Recalculer slideWidth en cas de redimensionnement de la fenêtre
+// Réajuster les slides en cas de redimensionnement
 window.addEventListener('resize', () => {
   if (slides && slides.length > 0) {
     slideWidth = slides[0].getBoundingClientRect().width;
     slides.forEach(setSlidePosition);
-    updateCarousel(currentIndex); // Maintenir la slide courante
+    updateCarousel(currentIndex);
   }
 });
 
@@ -93,17 +91,15 @@ if (nextBtn) {
   nextBtn.addEventListener('click', nextSlide);
 }
 
-// Modification de l'écouteur de clic pour la sélection
-if (carouselTrack) {
-  carouselTrack.addEventListener('click', (event) => {
-    const clickedImg = event.target.closest('img');
-    if (clickedImg) {
-      updateSelectedJersey(clickedImg);
-    }
-  });
-}
+// Sélection des maillots
+carouselTrack.addEventListener('click', (event) => {
+  const clickedImg = event.target.closest('img');
+  if (clickedImg) {
+    updateSelectedJersey(clickedImg);
+  }
+});
 
-// Fonction pour la validation du formulaire côté client
+// Validation du formulaire
 function checkFormValidity() {
   const selectedJersey = document.querySelector('.carousel-track img.selected');
   const teamNameInput = document.getElementById('teamName');
@@ -117,10 +113,14 @@ function checkFormValidity() {
   });
 
   submitBtn.disabled = !(selectedJersey && teamNameInput.value.trim() !== '' && allPlayersValid && emailInput.checkValidity());
-  displayJerseyError(); // Vérifier si le maillot est sélectionné avant de soumettre
+
+  // Affichage du message d'erreur si aucun maillot sélectionné
+  if (!selectedJersey) {
+    errorMessage.textContent = "Veuillez sélectionner un maillot.";
+  }
 }
 
-// Ajout dynamique de joueurs
+// Ajouter un joueur
 const addPlayerHandler = () => {
   const tr = document.createElement('tr');
   tr.innerHTML = `
@@ -132,27 +132,4 @@ const addPlayerHandler = () => {
     </td>
     <td><input type="number" name="number[]" min="0" max="99" required></td>
     <td><textarea name="anecdote[]" rows="2"></textarea></td>`;
-  playersList.appendChild(tr);
-  attachPlayerInputListeners(tr);
-  checkFormValidity();
-};
-
-if (addBtn) {
-  addBtn.addEventListener('click', addPlayerHandler);
-}
-
-// Attacher les listeners d'input aux champs de joueur pour la validation côté client
-function attachPlayerInputListeners(row) {
-  const inputs = row.querySelectorAll('input[type="text"][name="name[]"], input[type="number"][name="number[]"]');
-  inputs.forEach(input => {
-    input.addEventListener('input', checkFormValidity);
-  });
-}
-
-// Attacher les listeners d'input aux joueurs existants au chargement pour la validation côté client
-playersList.querySelectorAll('tr').forEach(attachPlayerInputListeners);
-
-// Validation de l'email côté client
-if (emailInput) {
-  emailInput.addEventListener('input', checkFormValidity);
-}
+ 
