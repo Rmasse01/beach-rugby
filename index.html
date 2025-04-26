@@ -5,18 +5,7 @@
   <title>Inscription – Occitan Beach Rugby</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --color-bg:      #F9E6D3;
-      --color-primary: #012A4A;
-      --color-accent:  #FF6F00;
-      --color-panel:   #FFE5B4;
-      --text-color:    #012A4A;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { height: 100%; font-family: 'Poppins', sans-serif; color: var(--text-color); background: var(--color-bg); text-align: center; }
-    < ... styles ... >
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header>
@@ -27,20 +16,23 @@
     <h2>Inscription d’équipe</h2>
     <form id="registrationForm" method="POST" action="/.netlify/functions/generate-csv" netlify>
       <h3 class="choose-left">Choisissez votre maillot</h3>
-      <div class="simple-carousel">
-        <img src="maillots/maillot01.png" alt="Maillot 01" onclick="selectJersey(this)">
-        <img src="maillots/maillot02.png" alt="Maillot 02" onclick="selectJersey(this)">
-        <img src="maillots/maillot03.png" alt="Maillot 03" onclick="selectJersey(this)">
-        <img src="maillots/maillot04.png" alt="Maillot 04" onclick="selectJersey(this)">
-        <img src="maillots/maillot05.png" alt="Maillot 05" onclick="selectJersey(this)">
-        <img src="maillots/maillot06.png" alt="Maillot 06" onclick="selectJersey(this)">
-        <img src="maillots/maillot07.png" alt="Maillot 07" onclick="selectJersey(this)">
-        <img src="maillots/maillot08.png" alt="Maillot 08" onclick="selectJersey(this)">
+      <div class="carousel-wrapper">
+        <button class="carousel-btn prev" onclick="prevSlide()">&#10094;</button>
+        <div class="carousel-track-container">
+          <div class="carousel-track" id="jerseyCarouselTrack">
+            <div class="slide"><img src="maillots/maillot01.png" alt="Maillot 01" onclick="selectJersey(this, 'Maillot 01')"></div>
+            <div class="slide"><img src="maillots/maillot02.png" alt="Maillot 02" onclick="selectJersey(this, 'Maillot 02')"></div>
+            <div class="slide"><img src="maillots/maillot03.png" alt="Maillot 03" onclick="selectJersey(this, 'Maillot 03')"></div>
+            <div class="slide"><img src="maillots/maillot04.png" alt="Maillot 04" onclick="selectJersey(this, 'Maillot 04')"></div>
+            <div class="slide"><img src="maillots/maillot05.png" alt="Maillot 05" onclick="selectJersey(this, 'Maillot 05')"></div>
+            <div class="slide"><img src="maillots/maillot06.png" alt="Maillot 06" onclick="selectJersey(this, 'Maillot 06')"></div>
+            <div class="slide"><img src="maillots/maillot07.png" alt="Maillot 07" onclick="selectJersey(this, 'Maillot 07')"></div>
+            <div class="slide"><img src="maillots/maillot08.png" alt="Maillot 08" onclick="selectJersey(this, 'Maillot 08')"></div>
+          </div>
+        </div>
+        <button class="carousel-btn next" onclick="nextSlide()">&#10095;</button>
       </div>
       <input type="hidden" name="jersey" id="jerseyInput" value="">
-
-      <label for="teamName">Nom de l’équipe :</label>
-      <input type="text" id="teamName" name="teamName" placeholder="Votre nom d’équipe" required>
 
       <h3>Informations des joueurs</h3>
       <div id="playersContainer">
@@ -114,142 +106,6 @@
   </table>
 </div>
 
-  <script>
-    const jerseyInput = document.getElementById('jerseyInput');
-    const addBtn = document.getElementById('addPlayer');
-    const playersContainer = document.getElementById('playersContainer');
-    const submitBtn = document.getElementById('submitBtn');
-    const emailInput = document.getElementById('email');
-    const playersDataInput = document.getElementById('playersData');
-    const dataDisplay = document.getElementById('dataDisplay');
-    const dataTable = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
-    const registrationForm = document.getElementById('registrationForm');
-
-    dataDisplay.style.display = 'none';
-
-    window.selectJersey = function(el) {
-      document.querySelectorAll('.simple-carousel img').forEach(i => i.classList.remove('selected'));
-      el.classList.add('selected');
-      jerseyInput.value = el.alt;
-      checkFormValidity();
-    };
-
-    function checkFormValidity() {
-      const selectedJersey = document.querySelector('.simple-carousel img.selected');
-      const teamNameInput = document.getElementById('teamName');
-      const playerRows = playersContainer.querySelectorAll('.player table tbody tr');
-      let allPlayersValid = true;
-      playerRows.forEach(row => {
-        const nameInput = row.querySelector('input[name="playerName"]');
-        const numberInput = row.querySelector('input[name="playerNumber"]');
-        if (nameInput && nameInput.value.trim() === '') allPlayersValid = false;
-        if (numberInput && numberInput.value.trim() === '') allPlayersValid = false;
-      });
-      submitBtn.disabled = !(selectedJersey && teamNameInput.value.trim() !== '' && allPlayersValid && emailInput.checkValidity());
-    }
-
-    const addPlayerHandler = () => {
-      const playerDiv = document.createElement('div');
-      playerDiv.classList.add('player');
-      playerDiv.innerHTML = `
-        <table>
-          <thead>
-            <tr>
-              <th>Nom / Surnom</th><th>Taille</th><th>Numéro (00–99)</th><th>Anecdote joueur</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><input type="text" name="playerName" required></td>
-              <td>
-                <select name="playerSize">
-                  <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option>
-                </select>
-              </td>
-              <td><input type="number" name="playerNumber" min="0" max="99" required></td>
-              <td><textarea name="playerAnecdote" rows="2"></textarea></td>
-            </tr>
-          </tbody>
-        </table>
-      `;
-      playersContainer.appendChild(playerDiv);
-      attachPlayerInputListeners(playerDiv);
-      checkFormValidity();
-    };
-
-    addBtn.addEventListener('click', addPlayerHandler);
-
-    function attachPlayerInputListeners(container) {
-      const inputs = container.querySelectorAll('input[type="text"][name="playerName"], input[type="number"][name="playerNumber"]');
-      inputs.forEach(input => {
-        input.addEventListener('input', checkFormValidity);
-      });
-    }
-
-    playersContainer.querySelectorAll('.player').forEach(attachPlayerInputListeners);
-    emailInput.addEventListener('input', checkFormValidity);
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const firstJersey = document.querySelector('.simple-carousel img:first-child');
-      if (firstJersey) {
-        firstJersey.classList.add('selected');
-        jerseyInput.value = firstJersey.alt;
-      }
-      checkFormValidity();
-    });
-
-    registrationForm.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const playersData = [];
-      const playerDivs = playersContainer.querySelectorAll('.player');
-      playerDivs.forEach(playerDiv => {
-        const nameInput = playerDiv.querySelector('input[name="playerName"]');
-        const sizeSelect = playerDiv.querySelector('select[name="playerSize"]');
-        const numberInput = playerDiv.querySelector('input[name="playerNumber"]');
-        const anecdoteInput = playerDiv.querySelector('textarea[name="playerAnecdote"]');
-        playersData.push({
-          name: nameInput.value,
-          size: sizeSelect.value,
-          number: numberInput.value,
-          anecdote: anecdoteInput.value
-        });
-      });
-      playersDataInput.value = JSON.stringify(playersData);
-      registrationForm.removeEventListener('submit', arguments.callee); // Supprimer l'écouteur pour éviter les doubles envois
-      registrationForm.submit();
-    });
-
-    fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
-      .then(response => response.json())
-      .then(data => {
-        dataDisplay.style.display = 'block';
-        if (data && data.length > 0) {
-          data.forEach(rowData => {
-            const players = JSON.parse(rowData.playersData || '[]');
-            players.forEach(player => {
-              const dataRow = dataTable.insertRow();
-              dataRow.insertCell().textContent = rowData.teamName || '';
-              dataRow.insertCell().textContent = rowData.jersey || '';
-              dataRow.insertCell().textContent = player.name || '';
-              dataRow.insertCell().textContent = player.size || '';
-              dataRow.insertCell().textContent = player.number || '';
-              dataRow.insertCell().textContent = player.anecdote || '';
-              dataRow.insertCell().textContent = rowData.sponsorLogo || '';
-              dataRow.insertCell().textContent = rowData.email || '';
-              dataRow.insertCell().textContent = rowData.ip || '';
-              dataRow.insertCell().textContent = rowData.user_agent || '';
-              dataRow.insertCell().textContent = rowData.referrer || '';
-              dataRow.insertCell().textContent = rowData.created_at || '';
-            });
-          });
-        } else {
-          dataDisplay.innerHTML = '<p>Aucune inscription n\'a été trouvée pour le moment.</p>';
-        }
-      })
-      .catch(error => {
-        console.error("Erreur lors de la récupération des données:", error);
-        dataDisplay.innerHTML = '<p>Erreur lors du chargement des inscriptions.</p>';
-      });
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
