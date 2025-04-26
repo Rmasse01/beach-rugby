@@ -15,49 +15,43 @@
   <div class="container">
     <h2>Inscription d’équipe</h2>
     <form id="registrationForm" method="POST" action="/.netlify/functions/generate-csv" netlify>
+
       <h3 class="choose-left">Choisissez votre maillot</h3>
-      <div class="carousel-wrapper">
-        <button class="carousel-btn prev" onclick="prevSlide()">&#10094;</button>
-        <div class="carousel-track-container">
-          <div class="carousel-track" id="jerseyCarouselTrack">
-            <div class="slide"><img src="maillots/maillot01.png" alt="Maillot 01" onclick="selectJersey(this, 'Maillot 01')"></div>
-            <div class="slide"><img src="maillots/maillot02.png" alt="Maillot 02" onclick="selectJersey(this, 'Maillot 02')"></div>
-            <div class="slide"><img src="maillots/maillot03.png" alt="Maillot 03" onclick="selectJersey(this, 'Maillot 03')"></div>
-            <div class="slide"><img src="maillots/maillot04.png" alt="Maillot 04" onclick="selectJersey(this, 'Maillot 04')"></div>
-            <div class="slide"><img src="maillots/maillot05.png" alt="Maillot 05" onclick="selectJersey(this, 'Maillot 05')"></div>
-            <div class="slide"><img src="maillots/maillot06.png" alt="Maillot 06" onclick="selectJersey(this, 'Maillot 06')"></div>
-            <div class="slide"><img src="maillots/maillot07.png" alt="Maillot 07" onclick="selectJersey(this, 'Maillot 07')"></div>
-            <div class="slide"><img src="maillots/maillot08.png" alt="Maillot 08" onclick="selectJersey(this, 'Maillot 08')"></div>
-          </div>
-        </div>
-        <button class="carousel-btn next" onclick="nextSlide()">&#10095;</button>
+      <div class="simple-carousel">
+        <img src="maillots/maillot01.png" alt="Maillot 01" onclick="selectJersey(this)">
+        <img src="maillots/maillot02.png" alt="Maillot 02" onclick="selectJersey(this)">
+        <img src="maillots/maillot03.png" alt="Maillot 03" onclick="selectJersey(this)">
+        <img src="maillots/maillot04.png" alt="Maillot 04" onclick="selectJersey(this)">
+        <img src="maillots/maillot05.png" alt="Maillot 05" onclick="selectJersey(this)">
+        <img src="maillots/maillot06.png" alt="Maillot 06" onclick="selectJersey(this)">
+        <img src="maillots/maillot07.png" alt="Maillot 07" onclick="selectJersey(this)">
+        <img src="maillots/maillot08.png" alt="Maillot 08" onclick="selectJersey(this)">
       </div>
       <input type="hidden" name="jersey" id="jerseyInput" value="">
 
+      <label for="teamName">Nom de l’équipe :</label>
+      <input type="text" id="teamName" name="teamName" placeholder="Votre nom d’équipe" required>
+
       <h3>Informations des joueurs</h3>
-      <div id="playersContainer">
-        <div class="player">
-          <table>
-            <thead>
-              <tr>
-                <th>Nom / Surnom</th><th>Taille</th><th>Numéro (00–99)</th><th>Anecdote joueur</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><input type="text" name="playerName" required></td>
-                <td>
-                  <select name="playerSize">
-                    <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option>
-                  </select>
-                </td>
-                <td><input type="number" name="playerNumber" min="0" max="99" required></td>
-                <td><textarea name="playerAnecdote" rows="2"></textarea></td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Nom / Surnom</th><th>Taille</th><th>Numéro (00–99)</th><th>Anecdote joueur</th>
+          </tr>
+        </thead>
+        <tbody id="playersList">
+          <tr>
+            <td><input type="text" name="name[]" required></td>
+            <td>
+              <select name="size[]">
+                <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option>
+              </select>
+            </td>
+            <td><input type="number" name="number[]" min="0" max="99" required></td>
+            <td><textarea name="anecdote[]" rows="2"></textarea></td>
+          </tr>
+        </tbody>
+      </table>
       <button type="button" id="addPlayer">Ajouter un joueur</button>
 
       <div class="sponsor-upload">

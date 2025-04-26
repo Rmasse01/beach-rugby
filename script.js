@@ -1,167 +1,112 @@
+// Sélection des éléments du DOM
 const jerseyInput = document.getElementById('jerseyInput');
-const addBtn = document.getElementById('addPlayer');
-const playersContainer = document.getElementById('playersContainer');
-const submitBtn = document.getElementById('submitBtn');
-const emailInput = document.getElementById('email');
-const playersDataInput = document.getElementById('playersData');
+const addBtn      = document.getElementById('addPlayer');
+const playersList = document.getElementById('playersList');
+const submitBtn   = document.getElementById('submitBtn');
+const emailInput  = document.getElementById('email');
+const dataTable   = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
 const dataDisplay = document.getElementById('dataDisplay');
-const dataTable = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
 const registrationForm = document.getElementById('registrationForm');
-const carouselTrack = document.getElementById('jerseyCarouselTrack');
-const slides = Array.from(carouselTrack.children);
-const slideWidth = slides[0].getBoundingClientRect().width;
-let currentIndex = 0;
 
+// Masquer initialement la section d'affichage des données
 dataDisplay.style.display = 'none';
 
-function setSlidePosition(slide, index) {
-  slide.style.left = slideWidth * index + 'px';
-}
-
-function updateCarousel(newIndex) {
-  const newPosition = newIndex * -slideWidth;
-  carouselTrack.style.transform = 'translateX(' + newPosition + 'px)';
-  currentIndex = newIndex;
-  updateSelectedJersey(slides[currentIndex].querySelector('img'));
-}
-
-function nextSlide() {
-  if (currentIndex < slides.length - 1) {
-    updateCarousel(currentIndex + 1);
-  }
-}
-
-function prevSlide() {
-  if (currentIndex > 0) {
-    updateCarousel(currentIndex - 1);
-  }
-}
-
-function updateSelectedJersey(el) {
-  document.querySelectorAll('.carousel-track img').forEach(img => img.classList.remove('selected'));
+// Fonction pour gérer la sélection du maillot
+window.selectJersey = function(el) { // Définition dans la portée globale
+  document.querySelectorAll('.simple-carousel img')
+      .forEach(i => i.classList.remove('selected'));
   el.classList.add('selected');
   jerseyInput.value = el.alt;
   checkFormValidity();
-}
+};
 
-window.selectJersey = function(el, altText) {
-  document.querySelectorAll('.carousel-track img').forEach(img => img.classList.remove('selected'));
-  el.classList.add('selected');
-  jerseyInput.value = altText;
-  checkFormValidity();
-}
-
+// Fonction pour la validation du formulaire côté client
 function checkFormValidity() {
-  const selectedJersey = document.querySelector('.carousel-track img.selected');
+  const selectedJersey = document.querySelector('.simple-carousel img.selected');
   const teamNameInput = document.getElementById('teamName');
-  const playerRows = playersContainer.querySelectorAll('.player table tbody tr');
+  const rows = playersList.querySelectorAll('tr');
   let allPlayersValid = true;
-  playerRows.forEach(row => {
-    const nameInput = row.querySelector('input[name="playerName"]');
-    const numberInput = row.querySelector('input[name="playerNumber"]');
+  rows.forEach(row => {
+    const nameInput = row.querySelector('input[name="name[]"]');
+    const numberInput = row.querySelector('input[name="number[]"]');
     if (nameInput && nameInput.value.trim() === '') allPlayersValid = false;
     if (numberInput && numberInput.value.trim() === '') allPlayersValid = false;
   });
+
   submitBtn.disabled = !(selectedJersey && teamNameInput.value.trim() !== '' && allPlayersValid && emailInput.checkValidity());
 }
 
+// Ajout dynamique de joueurs
 const addPlayerHandler = () => {
-  const playerDiv = document.createElement('div');
-  playerDiv.classList.add('player');
-  playerDiv.innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Nom / Surnom</th><th>Taille</th><th>Numéro (00–99)</th><th>Anecdote joueur</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><input type="text" name="playerName" required></td>
-          <td>
-            <select name="playerSize">
-              <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option>
-            </select>
-          </td>
-          <td><input type="number" name="playerNumber" min="0" max="99" required></td>
-          <td><textarea name="playerAnecdote" rows="2"></textarea></td>
-        </tr>
-      </tbody>
-    </table>
-  `;
-  playersContainer.appendChild(playerDiv);
-  attachPlayerInputListeners(playerDiv);
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" name="name[]" required></td>
+    <td>
+      <select name="size[]">
+        <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option>
+      </select>
+    </td>
+    <td><input type="number" name="number[]" min="0" max="99" required></td>
+    <td><textarea name="anecdote[]" rows="2"></textarea></td>`;
+  playersList.appendChild(tr);
+  attachPlayerInputListeners(tr);
   checkFormValidity();
-}
+};
 
 addBtn.addEventListener('click', addPlayerHandler);
 
-function attachPlayerInputListeners(container) {
-  const inputs = container.querySelectorAll('input[type="text"][name="playerName"], input[type="number"][name="playerNumber"]');
+// Attacher les listeners d'input aux champs de joueur pour la validation côté client
+function attachPlayerInputListeners(row) {
+  const inputs = row.querySelectorAll('input[type="text"][name="name[]"], input[type="number"][name="number[]"]');
   inputs.forEach(input => {
     input.addEventListener('input', checkFormValidity);
   });
 }
 
-playersContainer.querySelectorAll('.player').forEach(attachPlayerInputListeners);
-emailInput.addEventListener('input', checkFormValidity);
+// Attacher les listeners d'input aux joueurs existants au chargement pour la validation côté client
+playersList.querySelectorAll('tr').forEach(attachPlayerInputListeners);
 
-// Initialisation du carrousel
-slides.forEach(setSlidePosition);
+// Validation de l'email côté client
+emailInput.addEventListener('input', checkFormValidity);
 
 // Sélection du premier maillot au chargement et validation initiale
 document.addEventListener('DOMContentLoaded', () => {
-  const firstSlideImg = document.querySelector('.carousel-track .slide:first-child img');
-  if (firstSlideImg) {
-    firstSlideImg.classList.add('selected');
-    jerseyInput.value = firstSlideImg.alt;
+  const firstJersey = document.querySelector('.simple-carousel img:first-child');
+  if (firstJersey) {
+    firstJersey.classList.add('selected');
+    jerseyInput.value = firstJersey.alt;
   }
   checkFormValidity();
 });
 
-registrationForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const playersData = [];
-  const playerDivs = playersContainer.querySelectorAll('.player');
-  playerDivs.forEach(playerDiv => {
-    const nameInput = playerDiv.querySelector('input[name="playerName"]');
-    const sizeSelect = playerDiv.querySelector('select[name="playerSize"]');
-    const numberInput = playerDiv.querySelector('input[name="playerNumber"]');
-    const anecdoteInput = playerDiv.querySelector('textarea[name="playerAnecdote"]');
-    playersData.push({
-      name: nameInput.value,
-      size: sizeSelect.value,
-      number: numberInput.value,
-      anecdote: anecdoteInput.value
-    });
-  });
-  playersDataInput.value = JSON.stringify(playersData);
-  registrationForm.removeEventListener('submit', arguments.callee); // Pour éviter les doubles envois
-  registrationForm.submit();
-});
-
+// Script pour récupérer et afficher les données (avec gestion d'erreur améliorée)
 fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
   .then(response => response.json())
   .then(data => {
-    dataDisplay.style.display = 'block';
+    dataDisplay.style.display = 'block'; // Afficher la section des données
     if (data && data.length > 0) {
       data.forEach(rowData => {
-        const players = JSON.parse(rowData.playersData || '[]');
-        players.forEach(player => {
+        const names = rowData.name || [];
+        const sizes = rowData.size || [];
+        const numbers = rowData.number || [];
+        const anecdotes = rowData.anecdote || [];
+        const maxRows = Math.max(1, names.length);
+
+        for (let i = 0; i < Math.min(maxRows, 10); i++) {
           const dataRow = dataTable.insertRow();
           dataRow.insertCell().textContent = rowData.teamName || '';
           dataRow.insertCell().textContent = rowData.jersey || '';
-          dataRow.insertCell().textContent = player.name || '';
-          dataRow.insertCell().textContent = player.size || '';
-          dataRow.insertCell().textContent = player.number || '';
-          dataRow.insertCell().textContent = player.anecdote || '';
+          dataRow.insertCell().textContent = names[i] || '';
+          dataRow.insertCell().textContent = sizes[i] || '';
+          dataRow.insertCell().textContent = numbers[i] || '';
+          dataRow.insertCell().textContent = anecdotes[i] || '';
           dataRow.insertCell().textContent = rowData.sponsorLogo || '';
           dataRow.insertCell().textContent = rowData.email || '';
           dataRow.insertCell().textContent = rowData.ip || '';
           dataRow.insertCell().textContent = rowData.user_agent || '';
           dataRow.insertCell().textContent = rowData.referrer || '';
           dataRow.insertCell().textContent = rowData.created_at || '';
-        });
+        }
       });
     } else {
       dataDisplay.innerHTML = '<p>Aucune inscription n\'a été trouvée pour le moment.</p>';
