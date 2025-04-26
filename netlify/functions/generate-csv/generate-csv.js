@@ -13,12 +13,22 @@ exports.handler = async (event) => {
 
     const teamName = result.teamName;
     const jersey = result.jersey;
-    const names = result['name[]'] || []; // Accès au tableau des noms
-    const sizes = result['size[]'] || [];   // Accès au tableau des tailles
-    const numbers = result['number[]'] || []; // Accès au tableau des numéros
-    const anecdotes = result['anecdote[]'] || []; // Accès au tableau des anecdotes
-    const sponsorLogoFile = result.files[0]; // Le fichier est dans un tableau
+    const names = result['name[]'];
+    const sizes = result['size[]'];
+    const numbers = result['number[]'];
+    const anecdotes = result['anecdote[]'];
 
+    const ensureArray = (value) => {
+      return Array.isArray(value) ? value : (value ? [value] : []);
+    };
+
+    const allNames = ensureArray(names).map(name => `"${name}"`).join(';');
+    const allSizes = ensureArray(sizes).join(';');
+    const allNumbers = ensureArray(numbers).join(';');
+    const allAnecdotes = ensureArray(anecdotes).map(anecdote => `"${anecdote}"`).join(';');
+    const captainEmail = result.email || '';
+
+    const sponsorLogoFile = result.files[0]; // Le fichier est dans un tableau
     let sponsorLogoFilename = '';
     let sponsorLogoAttachment = null;
 
@@ -32,14 +42,6 @@ exports.handler = async (event) => {
     }
 
     let csvString = "Nom de l'équipe,Maillot,Noms,Tailles,Numéros,Anecdotes,Logo Sponsor,Email Capitaine\n";
-    const numPlayers = Math.max(names.length, sizes.length, numbers.length, anecdotes.length);
-
-    const allNames = names.map(name => `"${name}"`).join(';');
-    const allSizes = sizes.join(';');
-    const allNumbers = numbers.join(';');
-    const allAnecdotes = anecdotes.map(anecdote => `"${anecdote}"`).join(';');
-    const captainEmail = result.email || '';
-
     csvString += `${teamName},${jersey},${allNames},${allSizes},${allNumbers},${allAnecdotes},"${sponsorLogoFilename}",${captainEmail}\n`;
 
     const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
