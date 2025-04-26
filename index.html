@@ -2,103 +2,54 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Inscription – Occitan Beach Rugby</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <title>Inscription Tournoi Beach Rugby</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>OCCITAN BEACH RUGBY</h1>
-  </header>
 
-  <div class="container">
-    <h2>Inscription d’équipe</h2>
-    <form id="registrationForm" action="/" method="POST" enctype="multipart/form-data" data-netlify="true">
-      <h3 class="choose-left">Choisissez votre maillot</h3>
-      <div class="carousel-wrapper">
-        <button type="button" class="carousel-btn prev">&#8249;</button>
-        <div class="carousel-track-container">
-          <ul class="carousel-track" id="jerseyCarouselTrack">
-            <li class="slide"><img src="maillots/maillot01.png" alt="Maillot 01"></li>
-            <li class="slide"><img src="maillots/maillot02.png" alt="Maillot 02"></li>
-            <li class="slide"><img src="maillots/maillot03.png" alt="Maillot 03"></li>
-            <li class="slide"><img src="maillots/maillot04.png" alt="Maillot 04"></li>
-            <li class="slide"><img src="maillots/maillot05.png" alt="Maillot 05"></li>
-            <li class="slide"><img src="maillots/maillot06.png" alt="Maillot 06"></li>
-            <li class="slide"><img src="maillots/maillot07.png" alt="Maillot 07"></li>
-            <li class="slide"><img src="maillots/maillot08.png" alt="Maillot 08"></li>
-          </ul>
-        </div>
-        <button type="button" class="carousel-btn next">&#8250;</button>
+  <h1>Inscription au Tournoi de Beach Rugby</h1>
+
+  <!-- Carousel des maillots -->
+  <div id="jerseyCarousel">
+    <div id="jerseyCarouselTrack">
+      <div class="slide">
+        <img src="jersey1.jpg" alt="Maillot 1">
       </div>
-      <input type="hidden" name="jersey" id="jerseyInput" value="">
-
-      <label for="teamName">Nom de l’équipe :</label>
-      <input type="text" id="teamName" name="teamName" placeholder="Votre nom d’équipe" required>
-
-      <h3>Informations des joueurs</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Nom / Surnom</th><th>Taille</th><th>Numéro (00–99)</th><th>Anecdote joueur</th>
-          </tr>
-        </thead>
-        <tbody id="playersList">
-          <tr>
-            <td><input type="text" name="name[]" required></td>
-            <td>
-              <select name="size[]">
-                <option>XS</option><option>S</option><option selected>M</option><option>L</option><option>XL</option><option>XXL</option>
-              </select>
-            </td>
-            <td><input type="number" name="number[]" min="0" max="99" required></td>
-            <td><textarea name="anecdote[]" rows="2"></textarea></td>
-          </tr>
-        </tbody>
-      </table>
-      <button type="button" id="addPlayer">Ajouter un joueur</button>
-
-      <div class="sponsor-upload">
-        <label for="sponsorLogo">Logo du sponsor :</label>
-        <input type="file" id="sponsorLogo" name="sponsorLogo" accept="image/*">
+      <div class="slide">
+        <img src="jersey2.jpg" alt="Maillot 2">
       </div>
-
-      <div class="email-input">
-        <label for="email">Adresse e-mail du capitaine :</label>
-        <input type="email" id="email" name="email" placeholder="exemple@domaine.com" required>
+      <div class="slide">
+        <img src="jersey3.jpg" alt="Maillot 3">
       </div>
-
-      <button type="submit" id="submitBtn" class="payment-link" disabled>
-        Valider inscription
-      </button>
-    </form>
+      <!-- Ajoute d'autres maillots ici -->
+    </div>
+    <button class="carousel-btn prev">Précédent</button>
+    <button class="carousel-btn next">Suivant</button>
   </div>
 
-  <div id="dataDisplay">
-    <h2>Données des inscriptions</h2>
-    <table id="dataTable">
-      <thead>
-        <tr>
-          <th>Nom de l'équipe</th>
-          <th>Maillot</th>
-          <th>Nom</th>
-          <th>Taille</th>
-          <th>Numéro</th>
-          <th>Anecdote</th>
-          <th>Logo Sponsor</th>
-          <th>Email Capitaine</th>
-          <th>IP</th>
-          <th>User Agent</th>
-          <th>Referrer</th>
-          <th>Date de Création</th>
-        </tr>
-      </thead>
-      <tbody>
-        </tbody>
-    </table>
-  </div>
+  <!-- Message d'erreur -->
+  <div id="errorMessage">Veuillez sélectionner un maillot.</div>
+
+  <!-- Formulaire d'inscription -->
+  <form id="registrationForm">
+    <label for="teamName">Nom de l'équipe :</label>
+    <input type="text" id="teamName" required>
+
+    <label for="jerseyInput">Maillot sélectionné :</label>
+    <input type="text" id="jerseyInput" disabled>
+
+    <div id="playersList">
+      <h3>Liste des joueurs :</h3>
+    </div>
+
+    <button type="button" id="addPlayer">Ajouter un joueur</button>
+
+    <label for="email">Email du capitaine :</label>
+    <input type="email" id="email" required>
+
+    <button type="submit" id="submitBtn" disabled>Soumettre</button>
+  </form>
 
   <script src="script.js"></script>
 </body>
