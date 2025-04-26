@@ -1,28 +1,78 @@
-// Sélection des éléments du DOM
 const jerseyInput = document.getElementById('jerseyInput');
-const addBtn      = document.getElementById('addPlayer');
+const addBtn = document.getElementById('addPlayer');
 const playersList = document.getElementById('playersList');
-const submitBtn   = document.getElementById('submitBtn');
-const emailInput  = document.getElementById('email');
-const dataTable   = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
+const submitBtn = document.getElementById('submitBtn');
+const emailInput = document.getElementById('email');
+const dataTable = document.getElementById('dataTable').getElementsByTagName('tbody')[0];
 const dataDisplay = document.getElementById('dataDisplay');
 const registrationForm = document.getElementById('registrationForm');
+const carouselTrack = document.getElementById('jerseyCarouselTrack');
+const slides = Array.from(carouselTrack.children);
+const prevBtn = document.querySelector('.carousel-btn.prev');
+const nextBtn = document.querySelector('.carousel-btn.next');
+const slideWidth = slides[0].getBoundingClientRect().width;
+let currentIndex = 0;
 
 // Masquer initialement la section d'affichage des données
 dataDisplay.style.display = 'none';
 
-// Fonction pour gérer la sélection du maillot
-window.selectJersey = function(el) { // Définition dans la portée globale
-  document.querySelectorAll('.simple-carousel img')
-      .forEach(i => i.classList.remove('selected'));
+function setSlidePosition(slide, index) {
+  slide.style.left = slideWidth * index + 'px';
+}
+
+function updateCarousel(newIndex) {
+  const newPosition = newIndex * -slideWidth;
+  carouselTrack.style.transform = 'translateX(' + newPosition + 'px)';
+  currentIndex = newIndex;
+  updateSelectedJersey(slides[currentIndex].querySelector('img'));
+}
+
+function nextSlide() {
+  if (currentIndex < slides.length - 1) {
+    updateCarousel(currentIndex + 1);
+  }
+}
+
+function prevSlide() {
+  if (currentIndex > 0) {
+    updateCarousel(currentIndex - 1);
+  }
+}
+
+function updateSelectedJersey(el) {
+  document.querySelectorAll('.carousel-track img').forEach(img => img.classList.remove('selected'));
   el.classList.add('selected');
   jerseyInput.value = el.alt;
   checkFormValidity();
-};
+}
+
+// Initialisation du carrousel
+slides.forEach(setSlidePosition);
+
+// Sélection du premier maillot au chargement et validation initiale
+document.addEventListener('DOMContentLoaded', () => {
+  const firstSlideImg = document.querySelector('.carousel-track .slide:first-child img');
+  if (firstSlideImg) {
+    firstSlideImg.classList.add('selected');
+    jerseyInput.value = firstSlideImg.alt;
+  }
+  checkFormValidity();
+});
+
+prevBtn.addEventListener('click', prevSlide);
+nextBtn.addEventListener('click', nextSlide);
+
+carouselTrack.addEventListener('click', (event) => {
+  const clickedSlide = event.target.closest('.slide');
+  if (clickedSlide) {
+    const index = slides.indexOf(clickedSlide);
+    updateCarousel(index);
+  }
+});
 
 // Fonction pour la validation du formulaire côté client
 function checkFormValidity() {
-  const selectedJersey = document.querySelector('.simple-carousel img.selected');
+  const selectedJersey = document.querySelector('.carousel-track img.selected');
   const teamNameInput = document.getElementById('teamName');
   const rows = playersList.querySelectorAll('tr');
   let allPlayersValid = true;
@@ -69,16 +119,6 @@ playersList.querySelectorAll('tr').forEach(attachPlayerInputListeners);
 // Validation de l'email côté client
 emailInput.addEventListener('input', checkFormValidity);
 
-// Sélection du premier maillot au chargement et validation initiale
-document.addEventListener('DOMContentLoaded', () => {
-  const firstJersey = document.querySelector('.simple-carousel img:first-child');
-  if (firstJersey) {
-    firstJersey.classList.add('selected');
-    jerseyInput.value = firstJersey.alt;
-  }
-  checkFormValidity();
-});
-
 // Script pour récupérer et afficher les données (avec gestion d'erreur améliorée)
 fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
   .then(response => response.json())
@@ -116,3 +156,4 @@ fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
     console.error("Erreur lors de la récupération des données:", error);
     dataDisplay.innerHTML = '<p>Erreur lors du chargement des inscriptions.</p>';
   });
+  
