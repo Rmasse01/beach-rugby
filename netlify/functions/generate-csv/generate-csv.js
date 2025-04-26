@@ -22,12 +22,6 @@ exports.handler = async (event) => {
       return Array.isArray(value) ? value : (value ? [value] : []);
     };
 
-    const allNames = ensureArray(names).map(name => `"${name}"`).join(';');
-    const allSizes = ensureArray(sizes).join(';');
-    const allNumbers = ensureArray(numbers).join(';');
-    const allAnecdotes = ensureArray(anecdotes).map(anecdote => `"${anecdote}"`).join(';');
-    const captainEmail = result.email || '';
-
     const sponsorLogoFile = result.files[0]; // Le fichier est dans un tableau
     let sponsorLogoFilename = '';
     let sponsorLogoAttachment = null;
@@ -41,8 +35,17 @@ exports.handler = async (event) => {
       });
     }
 
-    let csvString = "Nom de l'équipe,Maillot,Noms,Tailles,Numéros,Anecdotes,Logo Sponsor,Email Capitaine\n";
-    csvString += `${teamName},${jersey},${allNames},${allSizes},${allNumbers},${allAnecdotes},"${sponsorLogoFilename}",${captainEmail}\n`;
+    let csvString = "Nom de l'équipe,Maillot,Nom,Taille,Numéro,Anecdote,Logo Sponsor,Email Capitaine\n";
+    const numPlayers = ensureArray(names).length; // Utiliser la longueur du tableau des noms
+    const captainEmail = result.email || '';
+
+    for (let i = 0; i < numPlayers; i++) {
+      const playerName = ensureArray(names)[i] || '';
+      const playerSize = ensureArray(sizes)[i] || '';
+      const playerNumber = ensureArray(numbers)[i] || '';
+      const playerAnecdote = ensureArray(anecdotes)[i] || '';
+      csvString += `${teamName},${jersey},"${playerName}","${playerSize}",${playerNumber},"${playerAnecdote}","${sponsorLogoFilename}",${captainEmail}\n`;
+    }
 
     const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
     const csvAttachment = new Mailgun.Attachment({ data: Buffer.from(csvString), filename: filename, contentType: 'text/csv' });
