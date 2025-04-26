@@ -56,8 +56,11 @@ exports.handler = async (event) => {
     await Mailgun.messages().send(data);
 
     return {
-      statusCode: 200,
-      body: JSON.stringify({ message: `Inscription enregistrée pour ${teamName}. Un email avec les données a été envoyé.` }),
+      statusCode: 303,
+      headers: {
+        "Location": "/thank-you"
+      },
+      body: JSON.stringify({ message: `Inscription enregistrée pour ${teamName}. Redirection vers la page de confirmation...` }),
     };
 
   } catch (error) {

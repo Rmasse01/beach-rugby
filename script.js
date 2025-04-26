@@ -7,10 +7,10 @@ const dataTable = document.getElementById('dataTable').getElementsByTagName('tbo
 const dataDisplay = document.getElementById('dataDisplay');
 const registrationForm = document.getElementById('registrationForm');
 const carouselTrack = document.getElementById('jerseyCarouselTrack');
-const slides = Array.from(carouselTrack.children);
 const prevBtn = document.querySelector('.carousel-btn.prev');
 const nextBtn = document.querySelector('.carousel-btn.next');
-const slideWidth = slides[0].getBoundingClientRect().width;
+let slides;
+let slideWidth;
 let currentIndex = 0;
 
 // Masquer initialement la section d'affichage des données
@@ -28,7 +28,7 @@ function updateCarousel(newIndex) {
 }
 
 function nextSlide() {
-  if (currentIndex < slides.length - 1) {
+  if (currentIndex < (slides ? slides.length - 1 : 0)) {
     updateCarousel(currentIndex + 1);
   }
 }
@@ -46,29 +46,48 @@ function updateSelectedJersey(el) {
   checkFormValidity();
 }
 
-// Initialisation du carrousel
-slides.forEach(setSlidePosition);
-
-// Sélection du premier maillot au chargement et validation initiale
+// Initialisation du carrousel après le chargement du DOM
 document.addEventListener('DOMContentLoaded', () => {
-  const firstSlideImg = document.querySelector('.carousel-track .slide:first-child img');
-  if (firstSlideImg) {
-    firstSlideImg.classList.add('selected');
-    jerseyInput.value = firstSlideImg.alt;
+  slides = Array.from(carouselTrack.children);
+  if (slides.length > 0) {
+    slideWidth = slides[0].getBoundingClientRect().width; // Calculer après le chargement
+    slides.forEach(setSlidePosition);
+    carouselTrack.style.transform = 'translateX(0)'; // Initialiser à la première slide
+    const firstSlideImg = document.querySelector('.carousel-track .slide:first-child img');
+    if (firstSlideImg) {
+      firstSlideImg.classList.add('selected');
+      jerseyInput.value = firstSlideImg.alt;
+    }
   }
   checkFormValidity();
 });
 
-prevBtn.addEventListener('click', prevSlide);
-nextBtn.addEventListener('click', nextSlide);
-
-// Modification de l'écouteur de clic pour la sélection
-carouselTrack.addEventListener('click', (event) => {
-  const clickedImg = event.target.closest('img');
-  if (clickedImg) {
-    updateSelectedJersey(clickedImg);
+// Recalculer slideWidth en cas de redimensionnement de la fenêtre (pour la responsivité)
+window.addEventListener('resize', () => {
+  if (slides && slides.length > 0) {
+    slideWidth = slides[0].getBoundingClientRect().width;
+    slides.forEach(setSlidePosition);
+    updateCarousel(currentIndex); // Maintenir la slide courante
   }
 });
+
+if (prevBtn) {
+  prevBtn.addEventListener('click', prevSlide);
+}
+
+if (nextBtn) {
+  nextBtn.addEventListener('click', nextSlide);
+}
+
+// Modification de l'écouteur de clic pour la sélection
+if (carouselTrack) {
+  carouselTrack.addEventListener('click', (event) => {
+    const clickedImg = event.target.closest('img');
+    if (clickedImg) {
+      updateSelectedJersey(clickedImg);
+    }
+  });
+}
 
 // Fonction pour la validation du formulaire côté client
 function checkFormValidity() {
@@ -103,7 +122,9 @@ const addPlayerHandler = () => {
   checkFormValidity();
 };
 
-addBtn.addEventListener('click', addPlayerHandler);
+if (addBtn) {
+  addBtn.addEventListener('click', addPlayerHandler);
+}
 
 // Attacher les listeners d'input aux champs de joueur pour la validation côté client
 function attachPlayerInputListeners(row) {
@@ -117,7 +138,9 @@ function attachPlayerInputListeners(row) {
 playersList.querySelectorAll('tr').forEach(attachPlayerInputListeners);
 
 // Validation de l'email côté client
-emailInput.addEventListener('input', checkFormValidity);
+if (emailInput) {
+  emailInput.addEventListener('input', checkFormValidity);
+}
 
 // Script pour récupérer et afficher les données (avec gestion d'erreur améliorée)
 fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
