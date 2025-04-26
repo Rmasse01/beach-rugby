@@ -156,4 +156,3 @@ fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
     console.error("Erreur lors de la récupération des données:", error);
     dataDisplay.innerHTML = '<p>Erreur lors du chargement des inscriptions.</p>';
   });
-  
