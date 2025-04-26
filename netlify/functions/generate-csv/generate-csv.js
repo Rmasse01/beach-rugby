@@ -19,13 +19,19 @@ exports.handler = async (event) => {
     const anecdotes = result['anecdote[]'];
 
     const ensureArray = (value) => {
-      return Array.isArray(value) ? value : (value ? [value] : []);
+      return Array.isArray(value) ? value : (typeof value === 'string' ? value.split(',') : (value ? [value] : []));
     };
 
     console.log("Names array:", names);
     console.log("Sizes array:", sizes);
     console.log("Numbers array:", numbers);
     console.log("Anecdotes array:", anecdotes);
+
+    const allNames = ensureArray(names).map(name => `"${name.trim()}"`).join(';');
+    const allSizes = ensureArray(sizes).map(size => size.trim()).join(';');
+    const allNumbers = ensureArray(numbers).map(number => number.trim()).join(';');
+    const allAnecdotes = ensureArray(anecdotes).map(anecdote => `"${anecdote.trim()}"`).join(';');
+    const captainEmail = result.email || '';
 
     const sponsorLogoFile = result.files[0]; // Le fichier est dans un tableau
     let sponsorLogoFilename = '';
@@ -40,22 +46,8 @@ exports.handler = async (event) => {
       });
     }
 
-    let csvString = "Nom de l'équipe,Maillot,Nom,Taille,Numéro,Anecdote,Logo Sponsor,Email Capitaine\n";
-    const numPlayers = ensureArray(names).length;
-    const captainEmail = result.email || '';
-
-    for (let i = 0; i < numPlayers; i++) {
-      console.log(`Iteration ${i}:`);
-      console.log(`  Player Name: ${ensureArray(names)[i]}`);
-      console.log(`  Player Size: ${ensureArray(sizes)[i]}`);
-      console.log(`  Player Number: ${ensureArray(numbers)[i]}`);
-      console.log(`  Player Anecdote: ${ensureArray(anecdotes)[i]}`);
-      const playerName = ensureArray(names)[i] || '';
-      const playerSize = ensureArray(sizes)[i] || '';
-      const playerNumber = ensureArray(numbers)[i] || '';
-      const playerAnecdote = ensureArray(anecdotes)[i] || '';
-      csvString += `${teamName},${jersey},"${playerName}","${playerSize}",${playerNumber},"${playerAnecdote}","${sponsorLogoFilename}",${captainEmail}\n`;
-    }
+    let csvString = "Nom de l'équipe,Maillot,Noms,Tailles,Numéros,Anecdotes,Logo Sponsor,Email Capitaine\n";
+    csvString += `${teamName},${jersey},${allNames},${allSizes},${allNumbers},${allAnecdotes},"${sponsorLogoFilename}",${captainEmail}\n`;
 
     const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
     const csvAttachment = new Mailgun.Attachment({ data: Buffer.from(csvString), filename: filename, contentType: 'text/csv' });
