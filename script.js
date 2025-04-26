@@ -40,9 +40,15 @@ function prevSlide() {
 }
 
 function updateSelectedJersey(el) {
-  document.querySelectorAll('.carousel-track img').forEach(img => img.classList.remove('selected'));
+  console.log('updateSelectedJersey appelée avec:', el);
+  document.querySelectorAll('.carousel-track img').forEach(img => {
+    console.log('Suppression de selected de:', img);
+    img.classList.remove('selected');
+  });
+  console.log('Ajout de selected à:', el);
   el.classList.add('selected');
   jerseyInput.value = el.alt;
+  console.log('jerseyInput.value mis à jour à:', jerseyInput.value);
   checkFormValidity();
 }
 
@@ -82,9 +88,13 @@ if (nextBtn) {
 // Modification de l'écouteur de clic pour la sélection
 if (carouselTrack) {
   carouselTrack.addEventListener('click', (event) => {
+    console.log('Clic sur le carrousel détecté', event.target);
     const clickedImg = event.target.closest('img');
     if (clickedImg) {
+      console.log('Image cliquée trouvée:', clickedImg);
       updateSelectedJersey(clickedImg);
+    } else {
+      console.log('Clic non sur une image');
     }
   });
 }
