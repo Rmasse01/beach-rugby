@@ -34,10 +34,10 @@ exports.handler = async (event) => {
     let csvString = "Nom de l'équipe,Maillot,Nom,Taille,Numéro,Anecdote,Logo Sponsor,Email Capitaine\n";
 
     for (let i = 0; i < names.length; i++) {
-      csvString += `${teamName},${jersey},"${names[i] || ''}","${sizes[i] || ''}",${numbers[i] || ''},"${anecdotes[i] || ''}","${sponsorLogoFilename}",${captainEmail}\n`;
+      csvString += ${teamName},${jersey},"${names[i] || ''}","${sizes[i] || ''}",${numbers[i] || ''},"${anecdotes[i] || ''}","${sponsorLogoFilename}",${captainEmail}\n;
     }
 
-    const filename = `inscription_${teamName?.replace(/\s+/g, '_')}.csv`;
+    const filename = inscription_${teamName?.replace(/\s+/g, '_')}.csv;
     const csvAttachment = new Mailgun.Attachment({ data: Buffer.from(csvString), filename: filename, contentType: 'text/csv' });
 
     const attachments = [csvAttachment];
@@ -46,10 +46,10 @@ exports.handler = async (event) => {
     }
 
     const data = {
-      from: `Inscriptions Beach Rugby <postmaster@${process.env.MAILGUN_DOMAIN}>`,
-      to: `rudy masse <rudy.masse@gmail.com>`, // Modifier ici pour captainEmail si souhaité
-      subject: `Nouvelle inscription pour l'équipe ${teamName}`,
-      text: `Ci-joint le fichier CSV des inscriptions de l'équipe ${teamName}.`,
+      from: Inscriptions Beach Rugby <postmaster@${process.env.MAILGUN_DOMAIN}>,
+      to: rudy masse <rudy.masse@gmail.com>, // Modifier ici pour captainEmail si souhaité
+      subject: Nouvelle inscription pour l'équipe ${teamName},
+      text: Ci-joint le fichier CSV des inscriptions de l'équipe ${teamName}.,
       attachment: attachments,
     };
 
@@ -60,7 +60,7 @@ exports.handler = async (event) => {
       headers: {
         "Location": "/thank-you"
       },
-      body: JSON.stringify({ message: `Inscription enregistrée pour ${teamName}. Redirection vers la page de confirmation...` }),
+      body: JSON.stringify({ message: Inscription enregistrée pour ${teamName}. Redirection vers la page de confirmation... }),
     };
 
   } catch (error) {

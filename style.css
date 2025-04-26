@@ -1,88 +1,106 @@
-/* Styles de base */
-body {
-  font-family: Arial, sans-serif;
-  background-color: #f8f8f8;
-  padding: 20px;
+:root {
+  --color-bg:      #F9E6D3;
+  --color-primary: #012A4A;
+  --color-accent:  #FF6F00;
+  --color-panel:   #FFE5B4;
+  --text-color:    #012A4A;
 }
-
-h1 {
-  text-align: center;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Poppins', sans-serif; color: var(--text-color); background: var(--color-bg); text-align: center; }
+header {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100vh;
+  background: url('header.jpg') center/cover no-repeat;
+  z-index: 0;
 }
-
-form {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+header h1 {
+  position: absolute; top: 20px; left: 50%;
+  transform: translateX(-50%);
+  color: white; font-size: 2.5em; font-weight: 600;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
 }
-
-label {
-  display: block;
-  margin: 10px 0 5px;
+.container {
+  position: relative; z-index: 1;
+  width: 100%; margin-top: 100vh;
+  padding: 20px; background: var(--color-bg);
 }
-
-input, textarea, select {
-  width: 100%;
-  padding: 8px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
+h2 { margin-bottom: 16px; }
+label { display: block; margin: 12px 0 4px; font-weight: 500; }
+h3.choose-left { text-align: left; margin: 24px 0 12px 20px; }
+input, select, textarea {
+  width: 80%; max-width: 400px;
+  padding: 8px; margin: 4px auto 16px;
+  border: 1px solid var(--color-primary); border-radius: 4px;
+  font-size: 1em; text-align: left;
+}
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+.carousel-wrapper { position: relative; margin: 24px 0; }
+.carousel-track-container { overflow: hidden; }
+.carousel-track {
+  display: flex; transition: transform .5s ease-in-out;
+}
+.carousel-track .slide { min-width: 25%; padding: 8px; }
+.carousel-track .slide img {
+  width: 100%; border: 4px solid transparent; border-radius: 8px;
+  cursor: pointer; display: block; margin: 0 auto;
+}
+.carousel-track .slide.selected img {
+  border: 4px solid var(--color-accent); /* Redéfinir complètement la bordure */
+  border-radius: 8px; /* Pour garder les coins arrondis */
+  animation: pulse 0.4s ease-in-out;
+}
+.carousel-btn {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(1,42,74,0.7); color: #fff; border: none;
+  font-size: 2em; padding: 0 12px; cursor: pointer; z-index: 2;
   border-radius: 4px;
 }
-
+.carousel-btn.prev { left: 8px; }
+.carousel-btn.next { right: 8px; }
+table {
+  width: 90%; margin: auto; border-collapse: collapse; margin-bottom: 16px;
+}
+th, td {
+  border: 1px solid var(--color-primary); padding: 8px; text-align: left;
+}
+th { background: var(--color-panel); font-weight: 600; }
 button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
+  font-family: inherit; font-size: 1em; cursor: pointer;
+  padding: 10px 16px; margin-bottom: 24px;
+  background: var(--color-accent); color: #fff;
+  border: none; border-radius: 4px;
 }
-
-button:disabled {
-  background-color: #ddd;
-  cursor: not-allowed;
+.payment-link {
+  display: block; width: 80%; max-width: 300px; margin: 24px auto;
+  padding: 14px; background: var(--color-primary);
+  color: #fff; text-decoration: none; font-weight: 600;
+  border-radius: 6px; margin-bottom: 40px;
 }
-
-/* Styles pour le carousel */
-#jerseyCarousel {
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-  margin: 20px 0;
+.sponsor-upload, .email-input { margin: 24px 0; }
+@media (max-width: 768px) {
+  header h1 { font-size: 2em; }
+  .carousel-track .slide { min-width: 50%; }
+  table, thead, tbody, th, td, tr { display: block; }
+  thead tr { display: none; }
+  tr { margin-bottom: 15px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
+  td { padding-left: 50%; position: relative; }
+  td::before {
+    position: absolute; left: 10px; width: 45%; white-space: nowrap; font-weight: bold;
+  }
+  td:nth-of-type(1)::before { content: "Nom / Surnom"; }
+  td:nth-of-type(2)::before { content: "Taille"; }
+  td:nth-of-type(3)::before { content: "Numéro"; }
+  td:nth-of-type(4)::before { content: "Anecdote joueur"; }
 }
-
-#jerseyCarouselTrack {
-  display: flex;
-  transition: transform 0.3s ease;
+/* Styles pour le carrousel simple (tu peux les supprimer si tu ne les utilises plus) */
+/* .simple-carousel { display:flex; overflow-x:auto; margin:20px 0; }
+.simple-carousel img {
+  height: 100px;
+  margin-right: 10px; cursor: pointer;
+  border: 3px solid transparent; flex-shrink: 0;
 }
-
-#jerseyCarousel .slide {
-  flex: 0 0 auto;
-  width: 100%;
-}
-
-#jerseyCarousel .slide img {
-  width: 100%;
-  cursor: pointer;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-}
-
-#jerseyCarousel .slide img:hover {
-  transform: scale(1.1);
-  opacity: 0.8;
-}
-
-#jerseyCarousel .slide img.selected {
-  border: 4px solid #4CAF50;
-}
-
-/* Message d'erreur */
-#errorMessage {
-  color: red;
-  font-size: 14px;
-  margin-top: 10px;
-  display: none;
-}
+.simple-carousel img.selected { border-color: var(--color-accent); } */
