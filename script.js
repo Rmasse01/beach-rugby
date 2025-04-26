@@ -47,8 +47,8 @@ function updateSelectedJersey(el) {
   });
   console.log('Ajout de selected à:', el);
   el.classList.add('selected');
+  console.log('Classe selected ajoutée à:', el);
   jerseyInput.value = el.alt;
-  console.log('jerseyInput.value mis à jour à:', jerseyInput.value);
   checkFormValidity();
 }
 
@@ -88,13 +88,11 @@ if (nextBtn) {
 // Modification de l'écouteur de clic pour la sélection
 if (carouselTrack) {
   carouselTrack.addEventListener('click', (event) => {
-    console.log('Clic sur le carrousel détecté', event.target);
+    console.log('Clic sur un élément dans le carrousel:', event.target.tagName);
     const clickedImg = event.target.closest('img');
     if (clickedImg) {
-      console.log('Image cliquée trouvée:', clickedImg);
+      console.log('Image cliquée trouvée (tagName):', clickedImg.tagName);
       updateSelectedJersey(clickedImg);
-    } else {
-      console.log('Clic non sur une image');
     }
   });
 }
