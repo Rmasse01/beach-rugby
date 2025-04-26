@@ -62,11 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
 prevBtn.addEventListener('click', prevSlide);
 nextBtn.addEventListener('click', nextSlide);
 
+// Modification de l'écouteur de clic pour la sélection
 carouselTrack.addEventListener('click', (event) => {
-  const clickedSlide = event.target.closest('.slide');
-  if (clickedSlide) {
-    const index = slides.indexOf(clickedSlide);
-    updateCarousel(index);
+  const clickedImg = event.target.closest('img');
+  if (clickedImg) {
+    updateSelectedJersey(clickedImg);
   }
 });
 
