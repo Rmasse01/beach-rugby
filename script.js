@@ -12,9 +12,18 @@ const nextBtn = document.querySelector('.carousel-btn.next');
 let slides;
 let slideWidth;
 let currentIndex = 0;
+let jerseySelected = false; // <- Pour savoir si un maillot est sélectionné
 
 // Masquer initialement la section d'affichage des données
 dataDisplay.style.display = 'none';
+
+// Créer une div d'erreur sous le carousel (au chargement)
+const jerseyError = document.createElement('div');
+jerseyError.style.color = 'red';
+jerseyError.style.marginTop = '10px';
+jerseyError.style.display = 'none';
+jerseyError.textContent = 'Veuillez sélectionner un maillot.';
+carouselTrack.parentNode.appendChild(jerseyError);
 
 function setSlidePosition(slide, index) {
   slide.style.left = slideWidth * index + 'px';
@@ -40,64 +49,91 @@ function prevSlide() {
 }
 
 function updateSelectedJersey(el) {
-  console.log('updateSelectedJersey appelée avec:', el);
   document.querySelectorAll('.carousel-track img').forEach(img => {
-    console.log('Suppression de selected de:', img);
     img.classList.remove('selected');
   });
-  console.log('Ajout de selected à:', el);
   el.classList.add('selected');
-  console.log('Classe selected ajoutée à:', el);
   jerseyInput.value = el.alt;
+  jerseySelected = true; // Un maillot a été sélectionné
+  jerseyError.style.display = 'none'; // Cacher l'erreur si correction
   checkFormValidity();
 }
 
-// Initialisation du carrousel après le chargement du DOM
+// Initialisation du carrousel
 document.addEventListener('DOMContentLoaded', () => {
   slides = Array.from(carouselTrack.children);
   if (slides.length > 0) {
-    slideWidth = slides[0].getBoundingClientRect().width; // Calculer après le chargement
+    slideWidth = slides[0].getBoundingClientRect().width;
     slides.forEach(setSlidePosition);
-    carouselTrack.style.transform = 'translateX(0)'; // Initialiser à la première slide
+    carouselTrack.style.transform = 'translateX(0)';
     const firstSlideImg = document.querySelector('.carousel-track .slide:first-child img');
     if (firstSlideImg) {
       firstSlideImg.classList.add('selected');
       jerseyInput.value = firstSlideImg.alt;
+      jerseySelected = true; // Première image sélectionnée par défaut
     }
   }
   checkFormValidity();
 });
 
-// Recalculer slideWidth en cas de redimensionnement de la fenêtre (pour la responsivité)
 window.addEventListener('resize', () => {
   if (slides && slides.length > 0) {
     slideWidth = slides[0].getBoundingClientRect().width;
     slides.forEach(setSlidePosition);
-    updateCarousel(currentIndex); // Maintenir la slide courante
+    updateCarousel(currentIndex);
   }
 });
 
-if (prevBtn) {
-  prevBtn.addEventListener('click', prevSlide);
-}
+// Navigation boutons
+if (prevBtn) prevBtn.addEventListener('click', prevSlide);
+if (nextBtn) nextBtn.addEventListener('click', nextSlide);
 
-if (nextBtn) {
-  nextBtn.addEventListener('click', nextSlide);
-}
-
-// Modification de l'écouteur de clic pour la sélection
+// Sélection par clic
 if (carouselTrack) {
   carouselTrack.addEventListener('click', (event) => {
-    console.log('Clic sur un élément dans le carrousel:', event.target.tagName);
-    const clickedImg = event.target.closest('img');
+    const clickedImg = event.target.tagName === 'IMG' ? event.target : null;
     if (clickedImg) {
-      console.log('Image cliquée trouvée (tagName):', clickedImg.tagName);
       updateSelectedJersey(clickedImg);
     }
   });
 }
 
-// Fonction pour la validation du formulaire côté client
+// Empêcher l'envoi du formulaire si pas de maillot sélectionné
+if (registrationForm) {
+  registrationForm.addEventListener('submit', (e) => {
+    if (!jerseySelected) {
+      e.preventDefault();
+      jerseyError.style.display = 'block'; // Afficher erreur sous carousel
+      carouselTrack.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Vérification Mailgun : simuler l'envoi de l'email et log
+      const formData = new FormData(registrationForm);
+      const dataToSend = Object.fromEntries(formData.entries());
+      console.log('Données du formulaire:', dataToSend);
+      
+      // Simuler l'envoi avec Mailgun (en backend, tu devras appeler Mailgun ici)
+      fetch('/mailgun-api', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          from: 'no-reply@tonsite.com',
+          to: dataToSend.email,  // email du capitaine
+          subject: 'Confirmation d\'inscription - Tournoi Beach Rugby',
+          text: `Merci de votre inscription ! Votre équipe est : ${dataToSend.teamName}`
+        })
+      })
+      .then(response => response.json())
+      .then(responseData => {
+        console.log('Réponse Mailgun:', responseData);
+      })
+      .catch(error => {
+        console.error('Erreur envoi Mailgun:', error);
+      });
+    }
+  });
+}
+
+// Validation du formulaire
 function checkFormValidity() {
   const selectedJersey = document.querySelector('.carousel-track img.selected');
   const teamNameInput = document.getElementById('teamName');
@@ -109,7 +145,6 @@ function checkFormValidity() {
     if (nameInput && nameInput.value.trim() === '') allPlayersValid = false;
     if (numberInput && numberInput.value.trim() === '') allPlayersValid = false;
   });
-
   submitBtn.disabled = !(selectedJersey && teamNameInput.value.trim() !== '' && allPlayersValid && emailInput.checkValidity());
 }
 
@@ -134,7 +169,6 @@ if (addBtn) {
   addBtn.addEventListener('click', addPlayerHandler);
 }
 
-// Attacher les listeners d'input aux champs de joueur pour la validation côté client
 function attachPlayerInputListeners(row) {
   const inputs = row.querySelectorAll('input[type="text"][name="name[]"], input[type="number"][name="number[]"]');
   inputs.forEach(input => {
@@ -142,19 +176,18 @@ function attachPlayerInputListeners(row) {
   });
 }
 
-// Attacher les listeners d'input aux joueurs existants au chargement pour la validation côté client
 playersList.querySelectorAll('tr').forEach(attachPlayerInputListeners);
 
-// Validation de l'email côté client
+// Validation de l'email
 if (emailInput) {
   emailInput.addEventListener('input', checkFormValidity);
 }
 
-// Script pour récupérer et afficher les données (avec gestion d'erreur améliorée)
+// Récupération des inscriptions existantes
 fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
   .then(response => response.json())
   .then(data => {
-    dataDisplay.style.display = 'block'; // Afficher la section des données
+    dataDisplay.style.display = 'block';
     if (data && data.length > 0) {
       data.forEach(rowData => {
         const names = rowData.name || [];
@@ -162,7 +195,6 @@ fetch('https://relaxed-zabaione-6a4060.netlify.app/.netlify/functions/read-csv')
         const numbers = rowData.number || [];
         const anecdotes = rowData.anecdote || [];
         const maxRows = Math.max(1, names.length);
-
         for (let i = 0; i < Math.min(maxRows, 10); i++) {
           const dataRow = dataTable.insertRow();
           dataRow.insertCell().textContent = rowData.teamName || '';
